@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Log;
 
 class AcademicResource extends Resource
 {
@@ -26,7 +27,10 @@ class AcademicResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                         ->unique(ignorable: fn ($record) => $record),
-                Forms\Components\Textarea::make('description')
+                Forms\Components\Textarea::make('description'),
+                Forms\Components\Toggle::make('status')
+                ->label('année en cours')
+                ->hiddenOn('create')
             ]);
     }
 
@@ -34,12 +38,18 @@ class AcademicResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('status')->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                ->label('Nom')
+                ->searchable(),
+                Tables\Columns\IconColumn::make('status')
+                    ->label('Anneé en cours')
+                    ->boolean()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('description')
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

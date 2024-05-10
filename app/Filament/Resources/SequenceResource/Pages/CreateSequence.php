@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateSequence extends CreateRecord
 {
     protected static string $resource = SequenceResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

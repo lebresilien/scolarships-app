@@ -5,6 +5,7 @@ namespace App\Filament\Resources\AcademicResource\Pages;
 use App\Filament\Resources\AcademicResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Log;
 
 class ListAcademics extends ListRecords
 {
@@ -13,7 +14,8 @@ class ListAcademics extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+            ->successRedirectUrl(route('filament.dashboard.resources.academics.index'))
         ];
     }
 }
