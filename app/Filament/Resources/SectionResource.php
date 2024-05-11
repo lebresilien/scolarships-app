@@ -53,7 +53,7 @@ class SectionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\GroupsRelationManager::class
         ];
     }
 

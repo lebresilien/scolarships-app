@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
 
 class GroupResource extends Resource
 {
@@ -31,7 +31,8 @@ class GroupResource extends Resource
                 Select::make('section_id')
                 ->relationship('Section', 'name')
                 ->required(),
-                Textarea::make('description')
+                RichEditor::make('description')
+                ->columnSpanFull()
             ]);
     }
 

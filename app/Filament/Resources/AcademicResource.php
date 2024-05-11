@@ -26,11 +26,13 @@ class AcademicResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                        ->unique(ignorable: fn ($record) => $record),
-                Forms\Components\Textarea::make('description'),
+                    ->columnSpanFull()
+                    ->unique(ignorable: fn ($record) => $record),
                 Forms\Components\Toggle::make('status')
                 ->label('année en cours')
-                ->hiddenOn('create')
+                ->hiddenOn('create'),
+                Forms\Components\RichEditor::make('description')
+                ->columnSpanFull(),
             ]);
     }
 
@@ -66,7 +68,7 @@ class AcademicResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\SequencesRelationManager::class
         ];
     }
 
