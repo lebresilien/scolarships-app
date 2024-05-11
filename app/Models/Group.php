@@ -38,8 +38,8 @@ class Group extends Model
         return $this->hasManyThrough(Note::class, Classroom::class);
     }
 
-    public function units() {
-        return $this->hasMany(Unit::class);
+    public function teachings() {
+        return $this->hasMany(TeachingUnit::class);
     }
 
 }

@@ -32,7 +32,7 @@ class GroupResource extends Resource
                 ->relationship('Section', 'name')
                 ->required(),
                 RichEditor::make('description')
-                ->columnSpanFull()
+                    ->columnSpanFull()
             ]);
     }
 
@@ -63,7 +63,8 @@ class GroupResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ClassroomsRelationManager::class
+            RelationManagers\ClassroomsRelationManager::class,
+            RelationManagers\TeachingsRelationManager::class
            /*  [
                 'label' => 'Section', // Label for the relationship section
                 'form' => [ // Form configuration for related model

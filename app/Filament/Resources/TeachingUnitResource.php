@@ -23,7 +23,14 @@ class TeachingUnitResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->unique(ignorable: fn ($record) => $record),
+                Forms\Components\Select::make('group_id')
+                    ->relationship('group', 'name')
+                    ->required(),
+                Forms\Components\RichEditor::make('description')
+                    ->columnSpanFull()
             ]);
     }
 
@@ -31,7 +38,11 @@ class TeachingUnitResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Libellé')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('groups.name'),
+                Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
