@@ -20,7 +20,16 @@ class ClassroomsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
+                    ->columnSpanFull()
                     ->maxLength(255),
+                Forms\Components\Select::make('user_id')
+                    ->relationship('User', 'name')
+                    ->required(),
+                Forms\Components\Select::make('building_id')
+                    ->relationship('Building', 'name')
+                    ->required(),
+                Forms\Components\RichEditor::make('description')
+                    ->columnSpanFull()
             ]);
     }
 
@@ -29,7 +38,12 @@ class ClassroomsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                ->label('Libellé')
+                ->searchable(),
+                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('building.name'),
+                Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
                 //
@@ -38,8 +52,10 @@ class ClassroomsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

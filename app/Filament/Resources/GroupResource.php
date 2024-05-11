@@ -63,6 +63,7 @@ class GroupResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\ClassroomsRelationManager::class
            /*  [
                 'label' => 'Section', // Label for the relationship section
                 'form' => [ // Form configuration for related model
