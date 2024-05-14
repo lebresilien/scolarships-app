@@ -10,6 +10,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Models\Course;
+use Closure;
 
 class CoursesRelationManager extends RelationManager
 {
@@ -22,19 +23,7 @@ class CoursesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->rule(static function(Forms\Get $get, Forms\Components\Component $component): Closure {
-                        return static function (string $attribute, $value, Closure $fail) use ($get, $component) {
-                            $existing = Course::where([
-                                ['name', $value], 
-                                ['teaching_unit_id', $get('teaching_unit_id')]
-                            ])->first();
-
-                            if ($existing && $existing->getKey() !== $component->getRecord()?->getKey()) {
-                                $group = ucwords($get('teaching_unit_id'));
-                                $fail("The {$value} Teaching Unit \"${group}\" already exists.");
-                            }
-                        };
-                }),
+                    ->unique(ignorable: fn ($record) => $record),
                 Forms\Components\TextInput::make('coefficient')
                     ->required(),
                 Forms\Components\Textarea::make('description')
@@ -46,7 +35,11 @@ class CoursesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Libelle')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('coefficient'),
+                Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
                 //
@@ -55,8 +48,10 @@ class CoursesRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
