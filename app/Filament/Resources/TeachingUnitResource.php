@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Closure;
 
 class TeachingUnitResource extends Resource
 {
@@ -24,8 +25,21 @@ class TeachingUnitResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->autofocus()
                     ->required()
-                    ->unique(ignorable: fn ($record) => $record),
+                    ->rule(static function(Forms\Get $get, Forms\Components\Component $component): Closure {
+                        return static function (string $attribute, $value, Closure $fail) use ($get, $component) {
+                            $existing = TeachingUnit::where([
+                                ['name', $value], 
+                                ['group_id', $get('group_id')]
+                            ])->first();
+
+                            if ($existing && $existing->getKey() !== $component->getRecord()?->getKey()) {
+                                $group = ucwords($get('group_id'));
+                                $fail("The {$group} Teaching Unit \"${value}\" already exists.");
+                            }
+                        };
+                    }),
                 Forms\Components\Select::make('group_id')
                     ->relationship('group', 'name')
                     ->required(),
@@ -41,7 +55,7 @@ class TeachingUnitResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->label('Libellé')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('groups.name'),
+                Tables\Columns\TextColumn::make('group.name'),
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
