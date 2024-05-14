@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TeachingUnitResource\Pages;
-use App\Filament\Resources\TeachingUnitResource\RelationManagers;
-use App\Models\TeachingUnit;
+use App\Filament\Resources\CourseResource\Pages;
+use App\Filament\Resources\CourseResource\RelationManagers;
+use App\Models\Course;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,9 +14,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Closure;
 
-class TeachingUnitResource extends Resource
+class CourseResource extends Resource
 {
-    protected static ?string $model = TeachingUnit::class;
+    protected static ?string $model = Course::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -29,22 +29,23 @@ class TeachingUnitResource extends Resource
                     ->required()
                     ->rule(static function(Forms\Get $get, Forms\Components\Component $component): Closure {
                         return static function (string $attribute, $value, Closure $fail) use ($get, $component) {
-                            $existing = TeachingUnit::where([
+                            $existing = Course::where([
                                 ['name', $value], 
-                                ['group_id', $get('group_id')]
+                                ['teaching_unit_id', $get('teaching_unit_id')]
                             ])->first();
 
                             if ($existing && $existing->getKey() !== $component->getRecord()?->getKey()) {
-                                $group = ucwords($get('group_id'));
-                                $fail("The {$group} Teaching Unit \"${value}\" already exists.");
+                                $group = ucwords($get('teaching_unit_id'));
+                                $fail("The {$value} Teaching Unit \"${group}\" already exists.");
                             }
                         };
                     }),
-                Forms\Components\Select::make('group_id')
-                    ->relationship('group', 'name')
+                Forms\Components\TextInput::make('coefficient')
                     ->required(),
-                Forms\Components\RichEditor::make('description')
-                    ->columnSpanFull()
+                Forms\Components\Select::make('teaching_unit_id')
+                    ->relationship('TeachingUnit', 'name')
+                    ->required(),
+                Forms\Components\Textarea::make('description')
             ]);
     }
 
@@ -52,10 +53,9 @@ class TeachingUnitResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Libellé')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('group.name'),
+                Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('coefficient'),
+                Tables\Columns\TextColumn::make('teachingUnit.name')->searchable(),
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
@@ -76,16 +76,16 @@ class TeachingUnitResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CoursesRelationManager::class,
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTeachingUnits::route('/'),
-            'create' => Pages\CreateTeachingUnit::route('/create'),
-            'edit' => Pages\EditTeachingUnit::route('/{record}/edit'),
+            'index' => Pages\ListCourses::route('/'),
+            'create' => Pages\CreateCourse::route('/create'),
+            'edit' => Pages\EditCourse::route('/{record}/edit'),
         ];
     }
 
