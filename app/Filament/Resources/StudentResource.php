@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
-use App\Models\Student;
+use App\Models\{Academic, Student};
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -92,13 +92,29 @@ class StudentResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('matricule')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('fname')
+                    ->label('Nom')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('lname')
+                    ->label('Prénom')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('sexe'),
+                Tables\Columns\TextColumn::make('born_at')
+                    ->label('Date de Naissance'),
+                Tables\Columns\TextColumn::make('born_place')
+                    ->label('Lieu de Naissance')
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

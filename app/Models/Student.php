@@ -24,8 +24,7 @@ class Student extends Model
         'allergy',
         'logo',
         'description',
-        'quarter',
-        'comming'
+        'quarter'
     ];
 
     protected $dates = [ 'deleted_at' ];
@@ -40,21 +39,6 @@ class Student extends Model
 
     public function notes() {
         return $this->hasMany(Note::class);
-    }
-
-    private function generateUniqueMatricule(): string
-    {
-        $prefix = 'STD'; // You can customize the prefix
-        $base = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
-        $matricule = $prefix . $base;
-
-        // Check for uniqueness and regenerate if needed
-        while (Student::where('matricule', $matricule)->exists()) {
-            $base = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
-            $matricule = $prefix . $base;
-        }
-
-        return $matricule;
     }
 
 }
