@@ -58,7 +58,13 @@ class StudentResource extends Resource
                             ->relationship('classrooms', 'name')
                             ->visibleOn('create')
                             ->required(),
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Montant Inscription')
+                            ->required()
+                            ->visibleOn('create')
+                            ->numeric(),
                         Forms\Components\RichEditor::make('description')
+                            ->columnSpanfull()
                             ->label('Description && Allergies')
                     ])
                     ->columns(2),
@@ -110,7 +116,9 @@ class StudentResource extends Resource
                     ->label('Lieu de Naissance')
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('Groupe')
+                ->relationship('classrooms.group', 'name'),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

@@ -9,6 +9,7 @@ use App\Models\{Transaction, Student};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use App\Filament\Traits\ActiveYear;
+use Illuminate\Support\Facades\DB;
 
 class CreateStudent extends CreateRecord
 {
@@ -20,9 +21,21 @@ class CreateStudent extends CreateRecord
         
         $data['matricule'] = Student::generateUniqueMatricule();
         
-        $student = Student::create($data);
-        $student->classrooms()->attach($data['classroom_id'], ['academic_id' => $this->active()->id]);
-        return $student;
+        $model = DB::transaction(function () use ($data) {
+            
+            $student = Student::create($data);
+            $student->classrooms()->attach($data['classroom_id'], ['academic_id' => $this->active()->id]);
+            
+            $transaction = Transaction::create([
+                'classroom_student_id' => $this->active()->id,
+                'name' => 'Inscription',
+                'amount' => $data['amount']
+            ]);
+
+            return $student;
+        });
+
+        return $model;
     }
 
     protected function getCreatedNotificationTitle(): ?string {
