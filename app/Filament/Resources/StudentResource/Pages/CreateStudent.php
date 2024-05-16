@@ -8,23 +8,20 @@ use Filament\Resources\Pages\CreateRecord;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use App\Filament\Traits\ActiveYear;
 
 class CreateStudent extends CreateRecord
 {
+    use ActiveYear;
+
     protected static string $resource = StudentResource::class;
 
-   /*  protected function mutateFormDataBeforeCreate(array $data): array
-    {
-        $data['matricule'] = '122';
-        $data['academic_id'] = 12;
- 
-        return $data;
-    } */
-
     protected function handleRecordCreation(array $data): Model {
-        $data['matricule'] = 12;
+        
+        $data['matricule'] = Student::generateUniqueMatricule();
+        
         $student = Student::create($data);
-        $student->classrooms()->attach($data['classroom_id'], ['academic_id' => $data['academic_id']]);
+        $student->classrooms()->attach($data['classroom_id'], ['academic_id' => $this->active()->id]);
         return $student;
     }
 

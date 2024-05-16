@@ -40,7 +40,6 @@ class StudentResource extends Resource
                                 1 => 'Homme',
                                 0 => 'Femme',
                             ])
-                            ->boolean()
                             ->inline()
                             ->default(1)
                             ->required(),
@@ -100,7 +99,10 @@ class StudentResource extends Resource
                 Tables\Columns\TextColumn::make('lname')
                     ->label('Prénom')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('sexe'),
+                Tables\Columns\TextColumn::make('sexe')
+                ->getStateUsing( function ($record){
+                    return $record->sexe ? 'H' : 'F';
+                 }),
                 Tables\Columns\TextColumn::make('born_at')
                     ->label('Date de Naissance'),
                 Tables\Columns\TextColumn::make('born_place')

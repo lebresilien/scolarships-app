@@ -4,10 +4,10 @@ namespace App\Filament\Traits;
 
 use App\Models\Academic;
 
-trait AcedemicYear
+trait ActiveYear
 {
 	
-	protected function activeAcedmic()
+	protected function active()
 	{
 		return Academic::where('status', true)->first();
 	}
