@@ -5,7 +5,7 @@ namespace App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
-use App\Models\Student;
+use App\Models\{Transaction, Student};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use App\Filament\Traits\ActiveYear;

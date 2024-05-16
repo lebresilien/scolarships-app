@@ -56,6 +56,7 @@ class StudentResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('classroom_id')
                             ->relationship('classrooms', 'name')
+                            ->visibleOn('create')
                             ->required(),
                         Forms\Components\RichEditor::make('description')
                             ->label('Description && Allergies')
