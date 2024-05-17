@@ -1,25 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\ClassroomResource\RelationManagers;
 
-use App\Filament\Resources\StudentResource\Pages;
-use App\Filament\Resources\StudentResource\RelationManagers;
-use App\Models\{Academic, Student};
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class StudentResource extends Resource
+class StudentsRelationManager extends RelationManager
 {
-    protected static ?string $model = Student::class;
+    protected static string $relationship = 'students';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -54,17 +49,12 @@ class StudentResource extends Resource
                             ->label('Quartier Habitation')
                             ->maxLength(255)
                             ->required(),
-                        Forms\Components\Select::make('classroom_id')
-                            ->relationship('classrooms', 'name')
-                            ->visibleOn('create')
-                            ->required(),
                         Forms\Components\TextInput::make('amount')
                             ->label('Montant Inscription')
                             ->required()
                             ->visibleOn('create')
                             ->numeric(),
                         Forms\Components\RichEditor::make('description')
-                            ->columnSpanfull()
                             ->label('Description && Allergies')
                     ])
                     ->columns(2),
@@ -94,9 +84,10 @@ class StudentResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('matricule')
             ->columns([
                 Tables\Columns\TextColumn::make('matricule')
                     ->searchable(),
@@ -116,47 +107,22 @@ class StudentResource extends Resource
                     ->label('Lieu de Naissance')
             ])
             ->filters([
-                //Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('Classe')
                 ->relationship('classrooms', 'name'),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
-                    Tables\Actions\ViewAction::make(),
-                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\ViewAction::make()
                 ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListStudents::route('/'),
-            'create' => Pages\CreateStudent::route('/create'),
-            'edit' => Pages\EditStudent::route('/{record}/edit'),
-        ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
             ]);
     }
 }
