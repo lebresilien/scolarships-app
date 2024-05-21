@@ -12,7 +12,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Select;
 
 class SequenceResource extends Resource
 {
@@ -27,9 +26,11 @@ class SequenceResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->unique(ignorable: fn ($record) => $record),
-                Select::make('academic_id')
+                Forms\Components\Select::make('academic_id')
                     ->relationship('Academic', 'name')
                     ->required(),
+                Forms\Components\Toggle::make('status')
+                    ->hiddenOn('create'),
                 Forms\Components\Textarea::make('description')
             ]);
     }
@@ -38,12 +39,21 @@ class SequenceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('academic.name'),
+                Tables\Columns\TextColumn::make('name')->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('academic.name')
+                    ->toggleable(),
+                Tables\Columns\IconColumn::make('status')
+                    ->boolean()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('description')
+                    ->toggleable()
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('academic')
+                    ->label('Année académique')
+                    ->relationship('academic', 'name')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
