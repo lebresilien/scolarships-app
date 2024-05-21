@@ -42,6 +42,7 @@ class SequenceResource extends Resource
                 Tables\Columns\TextColumn::make('name')->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('academic.name')
+                    ->label('Année académique')
                     ->toggleable(),
                 Tables\Columns\IconColumn::make('status')
                     ->boolean()

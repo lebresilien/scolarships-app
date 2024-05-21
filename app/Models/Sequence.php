@@ -13,6 +13,7 @@ class Sequence extends Model
     protected $fillable = [
         'academic_id',
         'name',
+        'status',
         'description'
     ];
 
