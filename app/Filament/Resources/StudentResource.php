@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Log;
 
 class StudentResource extends Resource
 {
@@ -116,9 +117,18 @@ class StudentResource extends Resource
                     ->label('Lieu de Naissance')
             ])
             ->filters([
-                //Tables\Filters\TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('Classe')
-                ->relationship('classrooms', 'name'),
+                Tables\Filters\Filter::make('academic_id')
+                    ->form([
+                        Forms\Components\Select::make('value')
+                        ->options(Academic::all()->pluck('name', 'id'))
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('academic_id', $value)),
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
