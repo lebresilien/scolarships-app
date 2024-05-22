@@ -107,8 +107,18 @@ class StudentsRelationManager extends RelationManager
                     ->label('Lieu de Naissance')
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('Classe')
-                ->relationship('classrooms', 'name'),
+                Tables\Filters\Filter::make('academic_id')
+                ->form([
+                    Forms\Components\Select::make('value')
+                    ->options(\App\Models\Academic::all()->pluck('name', 'id'))
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['value'],
+                            fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('academic_id', $value)),
+                        );
+                })
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
