@@ -9,7 +9,7 @@ class ClassroomStudent extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'classroom_id', 'academic_id'];
+    protected $fillable = ['student_id', 'classroom_id', 'academic_id', 'status'];
 
     public function transactions() {
         return $this->hasMany(Transaction::class);

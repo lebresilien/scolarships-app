@@ -29,12 +29,14 @@ class Student extends Model
 
     protected $dates = [ 'deleted_at' ];
 
+    protected $with = ['classrooms'];
+
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',
     ];
 
     public function classrooms() {
-        return $this->belongsToMany(Classroom::class)->withPivot('academic_id');
+        return $this->belongsToMany(Classroom::class)->withPivot('academic_id', 'status');
     }
 
     public function notes() {
@@ -56,6 +58,11 @@ class Student extends Model
         }
 
         return $matricule;
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->classrooms->pluck('pivot.status')[0];
     }
 
 }
