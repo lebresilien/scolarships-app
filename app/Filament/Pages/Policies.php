@@ -12,8 +12,8 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\{Academic};
 use Filament\Forms;
+use Filament\Pages\Actions\CreateAction;
 
 class Policies extends Page implements Tables\Contracts\HasTable
 {
@@ -36,7 +36,29 @@ class Policies extends Page implements Tables\Contracts\HasTable
         return Student::whereHas('classrooms', function($query) {
             $query->where('academic_id', $this->academicYear->id);
         });
-        //dd($s->get());
+    }
+
+    protected function getTableActions(): array
+    {
+        return [
+            Tables\Actions\ActionGroup::make([
+                Tables\Actions\Action::make('action-1')
+                ->label('My Custom Action')
+                ->icon('heroicon-o-eye')
+                ->form([
+                    Forms\Components\Select::make('authorId')
+                        ->label('Author')
+                        ->options(Student::query()->pluck('lname', 'id'))
+                        ->required(),
+                ])
+                ->action(function (array $data, $record): void {
+                    Log::info('test ' . json_encode($data));
+                    Log::info('uniii ' . $record);
+                }),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+        ];
     }
 
     protected function getTableColumns(): array
@@ -61,15 +83,11 @@ class Policies extends Page implements Tables\Contracts\HasTable
                 return $record->status ? 'Inscrit' : 'Démissionaire';
             })
             ->color(static function ($record): string {
-                if ($record->status) {
-                    return 'success';
-                }
-                
-                return 'danger';
-            })
-            
+                return $record->status ? 'success' : 'danger';
+            })  
         ];
     }
+
 
    /*  public function mount()
     {
