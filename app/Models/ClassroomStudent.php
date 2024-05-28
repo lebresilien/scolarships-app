@@ -11,6 +11,8 @@ class ClassroomStudent extends Model
 
     protected $fillable = ['student_id', 'classroom_id', 'academic_id', 'status'];
 
+    protected $table = 'classroom_student';
+    
     public function transactions() {
         return $this->hasMany(Transaction::class);
     }

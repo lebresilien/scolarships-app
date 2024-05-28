@@ -36,7 +36,7 @@ class Student extends Model
     ];
 
     public function classrooms() {
-        return $this->belongsToMany(Classroom::class)->withPivot('academic_id', 'status');
+        return $this->belongsToMany(Classroom::class)->withPivot('academic_id', 'status', 'id');
     }
 
     public function notes() {
@@ -62,7 +62,7 @@ class Student extends Model
 
     public function getStatusAttribute()
     {
-        return $this->classrooms->pluck('pivot.status')[0];
+        return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->status;
     }
 
 }
