@@ -131,7 +131,7 @@ class Policies extends Page implements Tables\Contracts\HasTable
                 ->getStateUsing( function ($record){
                     return $record->sexe ? 'H' : 'F';
                 }),
-            Tables\Columns\TextColumn::make('classrooms.name')
+            Tables\Columns\TextColumn::make('classroom')
                 ->label('Classe')
                 ->searchable(),
             Tables\Columns\BadgeColumn::make('status')

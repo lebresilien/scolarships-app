@@ -65,4 +65,9 @@ class Student extends Model
         return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->status;
     }
 
+    public function getClassroomAttribute()
+    {
+        return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->name;
+    }
+
 }
