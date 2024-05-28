@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource\RelationManagers;
-use App\Models\{Academic, Student};
+use App\Models\{Academic, Student, Classroom, ClassroomStudent, Transaction};
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +13,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
 
 class StudentResource extends Resource
 {
+
     protected static ?string $model = Student::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -135,6 +137,59 @@ class StudentResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\Action::make('Inscription')
+                    ->icon('heroicon-o-plus-circle')
+                    ->fillForm(fn (Student $record): array => [
+                        'fname' => $record->fname . ' ' . $record->fname,
+                    ])
+                    ->form([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('fname')
+                                    ->label('Noms et Prénoms')
+                                    ->columnSpan(2)
+                                    ->disabled(),
+                                Forms\Components\Select::make('classroom_id')
+                                    ->label('Classe')
+                                    ->options(Classroom::query()->pluck('name', 'id'))
+                                    ->required(),
+                                Forms\Components\TextInput::make('amount')
+                                    ->label('Montant')
+                                    ->numeric()
+                                    ->required()
+                            ])
+                    ])
+                    ->action(function (array $data, Student $student): void {
+
+                        $policy = ClassroomStudent::where('student_id', $student->id)
+                                                ->where('academic_id', Academic::where('status', true)->first()->id)
+                                                ->first();
+                        
+                        if($policy) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Une Erreur est survenu')
+                                ->body('Cet apprenant est deja inscrit pour l\'année scolaire en cours.')
+                                ->send();
+                        } else {
+
+                            $register = $student->classrooms()->attach($data['classroom_id'], [
+                                'academic_id' => Academic::where('status', true)->first()->id
+                            ]);
+                        
+                            Transaction::create([
+                                'name' => 'Inscription',
+                                'amount' => $data['amount'],
+                                'classroom_student_id' => $student->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->id
+                            ]);
+
+                            Notification::make()
+                                ->success()
+                                ->title('Opération réussie')
+                                ->body('Inscription a été enregistré.')
+                                ->send();
+                        }
+                    })
                 ])
             ])
             ->bulkActions([

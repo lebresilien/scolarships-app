@@ -112,7 +112,7 @@ class Policies extends Page implements Tables\Contracts\HasTable
                         ->body('Versement a été enregistré.')
                         ->send();
                 }),
-                Tables\Actions\DeleteAction::make(),
+                //Tables\Actions\DeleteAction::make(),
             ])
         ];
     }
