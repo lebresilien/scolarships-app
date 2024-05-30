@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Filament\Forms;
 use Filament\Pages\Actions\CreateAction;
 use Filament\Notifications\Notification;
+use Filament\Infolists;
+use App\Livewire\ViewTransaction;
 
 class Policies extends Page implements Tables\Contracts\HasTable
 {
@@ -112,7 +114,27 @@ class Policies extends Page implements Tables\Contracts\HasTable
                         ->body('Versement a été enregistré.')
                         ->send();
                 }),
-                //Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('List')
+                    ->icon('heroicon-o-list-bullet')
+                    ->modalContent(function(Student $record) {
+
+                        $academic = Academic::where('status', true)->first();
+                        
+                        $policy = ClassroomStudent::where('student_id', $record->id)
+                                                    ->where('academic_id', $academic->id)
+                                                    ->first();
+                        
+                        return view('welcome', [
+                            'transactions' => $policy->transactions
+                        ]);
+                    })
+                    /* ->infolist([
+                        Infolists\Components\Livewire::make(ViewTransaction::class)
+                    ]) */
+                    ->slideOver()
+                    ->stickyModalHeader()
+                    ->stickyModalFooter()
+                    ->modalSubmitAction(false)
             ])
         ];
     }
@@ -131,9 +153,11 @@ class Policies extends Page implements Tables\Contracts\HasTable
                 ->getStateUsing( function ($record){
                     return $record->sexe ? 'H' : 'F';
                 }),
-            Tables\Columns\TextColumn::make('classroom')
+            Tables\Columns\TextColumn::make('current_classroom')
                 ->label('Classe')
                 ->searchable(),
+            Tables\Columns\TextColumn::make('current_amount')
+                ->label('Montant'),
             Tables\Columns\BadgeColumn::make('status')
             ->getStateUsing( function ($record){
                 return $record->status ? 'Inscrit' : 'Démissionaire';
@@ -143,18 +167,5 @@ class Policies extends Page implements Tables\Contracts\HasTable
             })  
         ];
     }
-
-
-   /*  public function mount()
-    {
-        $this->academicYear = $this->active();
-
-        $students = Student::whereHas('classrooms', function($query) {
-            $query->where('academic_id', $this->academicYear->id);
-        });
-
-        $this->students = $students->get();
-    } */
-    
 
 }

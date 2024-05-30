@@ -65,9 +65,22 @@ class Student extends Model
         return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->status;
     }
 
-    public function getClassroomAttribute()
+    public function getCurrentClassroomAttribute(): string
     {
         return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->name;
     }
 
+    public function getCurrentAmountAttribute(): int
+    {
+        $amount = 0;
+
+        $policy_id = $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->id;
+        $policy = \App\Models\ClassroomStudent::find($policy_id);
+        
+        foreach($policy->transactions as $trx) {
+            $amount += $trx->amount;
+        }
+        
+        return $amount;
+    }
 }
