@@ -124,8 +124,9 @@ class Policies extends Page implements Tables\Contracts\HasTable
                                                     ->where('academic_id', $academic->id)
                                                     ->first();
                         
-                        return view('welcome', [
-                            'transactions' => $policy->transactions
+                        return view('livewire.view-transaction', [
+                            'transactions' => $policy->transactions,
+                            'name' => $record->fname . ' ' . $record->lname
                         ]);
                     })
                     /* ->infolist([
