@@ -17,6 +17,7 @@ use Filament\Pages\Actions\CreateAction;
 use Filament\Notifications\Notification;
 use Filament\Infolists;
 use App\Livewire\ViewTransaction;
+use Filament\Actions\StaticAction;
 
 class Policies extends Page implements Tables\Contracts\HasTable
 {
@@ -129,13 +130,11 @@ class Policies extends Page implements Tables\Contracts\HasTable
                             'name' => $record->fname . ' ' . $record->lname
                         ]);
                     })
-                    /* ->infolist([
-                        Infolists\Components\Livewire::make(ViewTransaction::class)
-                    ]) */
                     ->slideOver()
                     ->stickyModalHeader()
                     ->stickyModalFooter()
                     ->modalSubmitAction(false)
+                    ->modalCancelAction(fn (StaticAction $action) => $action->label('Fermer'))
             ])
         ];
     }

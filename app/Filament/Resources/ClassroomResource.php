@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClassroomResource\Pages;
 use App\Filament\Resources\ClassroomResource\RelationManagers;
-use App\Models\Classroom;
+use App\Models\{ Academic, Classroom };
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,6 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\Log;
+use App\Livewire\ViewNote;
+use Livewire\Livewire;
 
 class ClassroomResource extends Resource
 {
@@ -52,7 +55,25 @@ class ClassroomResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Notes')
+                        ->icon('heroicon-o-list-bullet')
+                        ->modalContent(function(Classroom $record) {
+                          
+                           /*  $academic = Academic::where('status', true)->first();
+
+                            $students = $record->students()
+                                                ->where('status', true)
+                                                ->where('academic_id', $academic->id)
+                                                ->get(); */
+
+                            return view('livewire.view-note', [
+                                'students' => $record,
+                                //'sequences' => $academic->sequences
+                            ]);
+                        })
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
