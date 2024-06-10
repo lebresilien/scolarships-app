@@ -9,19 +9,25 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use App\Models\Classroom;
+use App\Filament\Traits\ActiveYear;
 
 class ViewNote extends Component
 {
+    use ActiveYear;
 
-    public function mount($classroom_id)
+    public $classrooms ;
+    protected $academicYear;
+
+    public function mount()
     {
-       
-        /* $students = $classroom->students()
-                            ->where('status', true)
-                            ->where('academic_id', $academic->id)
-                            ->get();
+        $this->academicYear = $this->active();
 
-        return $this->students = $students; */
+       /*  $this->classrooms = Classroom::whereHas('students', function($query) {
+            $query->where('academic_id', $this->academicYear->id);
+        })->get(); */
+
+        $this->classrooms = Classroom::all();
     }
 
     public function render()

@@ -1,3 +1,5 @@
 <div>
-    Livewire Component
+   @php
+      dd($record)
+   @endphp
 </div>

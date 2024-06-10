@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClassroomResource\Pages;
+use App\Filament\Pages\NotePage;
 use App\Filament\Resources\ClassroomResource\RelationManagers;
 use App\Models\{ Academic, Classroom, Sequence };
 use Filament\Forms;
@@ -84,7 +85,7 @@ class ClassroomResource extends Resource
                                     TextInput::make('name')->required()
                                 ]),
                         ])*/
-                        ->url(fn (): string => route('classrooms.notes', ['classroom_id' => 87]))
+                        //->url(fn (): string => route('dashboard/notes'))
                         /* ->modalContent(function(Classroom $record) {
                           
                            $academic = Academic::where('status', true)->first();
@@ -125,6 +126,7 @@ class ClassroomResource extends Resource
             'index' => Pages\ListClassrooms::route('/'),
             'create' => Pages\CreateClassroom::route('/create'),
             'edit' => Pages\EditClassroom::route('/{record}/edit'),
+            'notes' => Pages\NoteClassroom::route('/{record}/notes')
         ];
     }
 
