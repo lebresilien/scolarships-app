@@ -30,7 +30,7 @@ class Group extends Model
     }
 
     public function courses() {
-        return $this->hasManyThrough(Course::class, Unit::class);
+        return $this->hasManyThrough(Course::class, TeachingUnit::class);
     }
 
     public function notes()

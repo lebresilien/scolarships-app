@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ClassroomResource\Pages;
 use App\Filament\Resources\ClassroomResource\RelationManagers;
-use App\Models\{ Academic, Classroom };
+use App\Models\{ Academic, Classroom, Sequence };
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +13,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Select;
-use Illuminate\Support\Facades\Log;
 use App\Livewire\ViewNote;
 use Livewire\Livewire;
+use Filament\Actions\StaticAction;
+use Filament\Forms\Components\MarkdownEditor;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard\Step;
 
 class ClassroomResource extends Resource
 {
@@ -59,20 +62,45 @@ class ClassroomResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('Notes')
                         ->icon('heroicon-o-list-bullet')
-                        ->modalContent(function(Classroom $record) {
+                        /*->steps([
+                            Step::make('Etape 1')
+                                ->description('selectionner la sequence et le cours')
+                                ->schema([
+                                    Select::make('sequence_id')
+                                        ->label('Sequence')
+                                        ->options(Sequence::query()->pluck('name', 'id'))
+                                        ->required(),
+                                    Select::make('course_id')
+                                        ->relationship('group.courses', 'name')
+                                        ->required()
+                                ])
+                                ->columns(2),
+                            Step::make('Etape 2')
+                                ->description('Remplisser les notes')
+                                ->schema([
+                                    Select::make('course_id')
+                                        ->relationship('students', 'fname')
+                                        ->required(),
+                                    TextInput::make('name')->required()
+                                ]),
+                        ])*/
+                        ->url(fn (): string => route('classrooms.notes', ['classroom_id' => 87]))
+                        /* ->modalContent(function(Classroom $record) {
                           
-                           /*  $academic = Academic::where('status', true)->first();
+                           $academic = Academic::where('status', true)->first();
 
                             $students = $record->students()
                                                 ->where('status', true)
                                                 ->where('academic_id', $academic->id)
-                                                ->get(); */
+                                                ->get();
 
                             return view('livewire.view-note', [
-                                'students' => $record,
-                                //'sequences' => $academic->sequences
+                                'students' => $students,
+                                'sequences' => $academic->sequences
                             ]);
                         })
+                        ->modalSubmitAction(false)
+                        ->modalCancelAction(fn (StaticAction $action) => $action->label('Fermer')) */
                 ])
             ])
             ->bulkActions([
