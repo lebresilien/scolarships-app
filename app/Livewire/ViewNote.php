@@ -21,8 +21,9 @@ class ViewNote extends Component
     public $record;
     protected $academicYear;
     public $isOpen = false;
-    public $course_id;
-    public $students;
+    public $course;
+    public $seq;
+    public $students = [];
 
     public function mount($record)
     {
@@ -33,15 +34,35 @@ class ViewNote extends Component
         $this->record = $record;
     }
 
-    public function show($course_id, $seq_id)
+    public function show($course, $seq)
     {
         $this->isOpen = true;
-        $this->course_id = $course_id;
+        $this->course = $course;
+        $this->seq = $seq; 
         
-        $this->students = $this->record->students()
+        $data = $this->record->students()
                             ->wherePivot('academic_id', $this->active()->id)
                             ->wherePivot('status', true)
                             ->get();
+        //dd($data);
+
+        $result = collect([]);
+
+        foreach($data as $student) {
+
+            $note = Note::where('classroom_student_id', $student->pivot->id)
+                        ->where('course_id', $course['id'])
+                        ->where('sequence_id', $seq['id'])
+                        ->first();
+            
+            $result->push([
+                'id' =>  $student->pivot->id,
+                'name' => $student->lname . ' ' . $student->fname,
+                'value' => $note ?  $note->value : 0,
+            ]);
+        }
+
+        $this->students = $result;
     }
 
     public function hide()

@@ -7,8 +7,7 @@
          @foreach($sequences as $sequence)
             <button
                type="button"
-               wire:click="show({{$course->id}}, {{$sequence->id}})"
-               title="{{$sequence->id}}"
+               wire:click="show({{$course}}, {{$sequence}})"
             >
                {{ $sequence->name }}
             </button>
