@@ -16,4 +16,8 @@ class ClassroomStudent extends Model
     public function transactions() {
         return $this->hasMany(Transaction::class);
     }
+
+    public function notes() {
+        return $this->hasMany(Note::class);
+    }
 }

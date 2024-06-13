@@ -9,25 +9,44 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
-use App\Models\Classroom;
+use App\Models\{ Sequence, Classroom, Note };
 use App\Filament\Traits\ActiveYear;
+use Illuminate\Support\Facades\Log;
 
 class ViewNote extends Component
 {
     use ActiveYear;
 
-    public $classrooms ;
+    public $sequences;
+    public $record;
     protected $academicYear;
+    public $isOpen = false;
+    public $course_id;
+    public $students;
 
-    public function mount()
+    public function mount($record)
     {
         $this->academicYear = $this->active();
 
-       /*  $this->classrooms = Classroom::whereHas('students', function($query) {
-            $query->where('academic_id', $this->academicYear->id);
-        })->get(); */
+        $this->sequences = Sequence::where('academic_id', $this->academicYear->id)->get();
 
-        $this->classrooms = Classroom::all();
+        $this->record = $record;
+    }
+
+    public function show($course_id, $seq_id)
+    {
+        $this->isOpen = true;
+        $this->course_id = $course_id;
+        
+        $this->students = $this->record->students()
+                            ->wherePivot('academic_id', $this->active()->id)
+                            ->wherePivot('status', true)
+                            ->get();
+    }
+
+    public function hide()
+    {
+        $this->isOpen = false;
     }
 
     public function render()
