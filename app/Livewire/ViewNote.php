@@ -61,7 +61,7 @@ class ViewNote extends Component
                 'value' => $note ?  $note->value : 0,
             ]);
         }
-
+        
         $this->students = $result;
     }
 
