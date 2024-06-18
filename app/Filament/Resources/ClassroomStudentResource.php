@@ -44,7 +44,7 @@ class ClassroomStudentResource extends Resource
                     ->getStateUsing( function ($record){
                         return $record->sexe ? 'H' : 'F';
                     }),
-                Tables\Columns\TextColumn::make('current_classroom')
+                Tables\Columns\TextColumn::make('current_classroom.name')
                     ->label('Classe'),
                 Tables\Columns\TextColumn::make('current_amount')
                     ->label('Montant'),
@@ -60,6 +60,7 @@ class ClassroomStudentResource extends Resource
                 Tables\Filters\Filter::make('classroom_id')
                     ->form([
                         Forms\Components\Select::make('value')
+                        ->label('Classe')
                         ->options(Classroom::all()->pluck('name', 'id'))
                     ])
                     ->query(function (Builder $query, array $data): Builder {
@@ -71,7 +72,47 @@ class ClassroomStudentResource extends Resource
                     })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Editer')
+                    ->icon('heroicon-s-pencil-square')
+                    ->fillForm(fn (Student $record): array => [
+                        'classroom_id' => $record->current_classroom->id,
+                        'academic_id' => $record->classrooms[0]->pivot->academic_id,
+                        'status' => $record->status,
+                        'name' => $record->fname . ' ' . $record->fname,
+                    ])
+                    ->form([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\Select::make('classroom_id')
+                                    ->label('Classe')
+                                    ->options(Classroom::query()->pluck('name', 'id'))
+                                    ->required(),
+                                Forms\Components\Select::make('academic_id')
+                                    ->label('Année Académique')
+                                    ->options(Academic::query()->pluck('name', 'id'))
+                                    ->required(),
+                                Forms\Components\Toggle::make('status'),
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Noms et Prénoms')
+                                    ->disabled()
+                            ])
+                    ])
+                    ->action(function (array $data, Student $record): void {
+
+                        $policy = $record->classrooms()
+                                            ->where('classroom_id', $record->current_classroom->id)
+                                            ->first()
+                                            ->pivot;
+                      
+                        $policy->classroom_id = $data['classroom_id'];
+                        $policy->academic_id = $data['academic_id'];
+                        $policy->status = $data['status'];
+     
+                        $policy->save();
+                     })
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -83,7 +124,7 @@ class ClassroomStudentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\TransactionsRelationManager::class
         ];
     }
 
@@ -98,7 +139,7 @@ class ClassroomStudentResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $academicYear = Academic::where('status', true)->first();;
+        $academicYear = Academic::where('status', true)->first();
 
         return Student::whereHas('classrooms', function($query) use ($academicYear) {
             $query->where('academic_id', $academicYear->id);

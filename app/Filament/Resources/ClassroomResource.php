@@ -63,45 +63,6 @@ class ClassroomResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('Notes')
                         ->icon('heroicon-o-list-bullet')
-                        /*->steps([
-                            Step::make('Etape 1')
-                                ->description('selectionner la sequence et le cours')
-                                ->schema([
-                                    Select::make('sequence_id')
-                                        ->label('Sequence')
-                                        ->options(Sequence::query()->pluck('name', 'id'))
-                                        ->required(),
-                                    Select::make('course_id')
-                                        ->relationship('group.courses', 'name')
-                                        ->required()
-                                ])
-                                ->columns(2),
-                            Step::make('Etape 2')
-                                ->description('Remplisser les notes')
-                                ->schema([
-                                    Select::make('course_id')
-                                        ->relationship('students', 'fname')
-                                        ->required(),
-                                    TextInput::make('name')->required()
-                                ]),
-                        ])*/
-                        //->url(fn (): string => route('dashboard/notes'))
-                        /* ->modalContent(function(Classroom $record) {
-                          
-                           $academic = Academic::where('status', true)->first();
-
-                            $students = $record->students()
-                                                ->where('status', true)
-                                                ->where('academic_id', $academic->id)
-                                                ->get();
-
-                            return view('livewire.view-note', [
-                                'students' => $students,
-                                'sequences' => $academic->sequences
-                            ]);
-                        })
-                        ->modalSubmitAction(false)
-                        ->modalCancelAction(fn (StaticAction $action) => $action->label('Fermer')) */
                 ])
             ])
             ->bulkActions([

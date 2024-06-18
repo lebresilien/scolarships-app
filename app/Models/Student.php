@@ -45,7 +45,7 @@ class Student extends Model
 
     public static function generateUniqueMatricule(): string
     {
-        $currentAcademicYear = \App\Models\Academic::where('status', true)->first();
+        $currentAcademicYear = Academic::where('status', true)->first();
         $prefix = explode('-', $currentAcademicYear->name);
         $school = 'PIG'; // You can customize the prefix
         $base = str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
@@ -62,19 +62,19 @@ class Student extends Model
 
     public function getStatusAttribute()
     {
-        return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->status;
+        return $this->classrooms()->where('academic_id' , Academic::where('status', true)->first()->id)->first()->pivot->status;
     }
 
-    public function getCurrentClassroomAttribute(): string
+    public function getCurrentClassroomAttribute(): Classroom
     {
-        return $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->name;
+        return $this->classrooms()->where('academic_id' , Academic::where('status', true)->first()->id)->first();
     }
 
     public function getCurrentAmountAttribute(): int
     {
         $amount = 0;
 
-        $policy_id = $this->classrooms()->where('academic_id' , \App\Models\Academic::where('status', true)->first()->id)->first()->pivot->id;
+        $policy_id = $this->classrooms()->where('academic_id' , Academic::where('status', true)->first()->id)->first()->pivot->id;
         $policy = \App\Models\ClassroomStudent::find($policy_id);
         
         foreach($policy->transactions as $trx) {
@@ -82,5 +82,12 @@ class Student extends Model
         }
         
         return $amount;
+    }
+
+    public function transactions() {
+        return $this->hasMany(ClassroomStudent::class)
+                    ->where('academic_id', Academic::where('status', true)->first()->id)
+                    ->first()
+                    ->transactions();
     }
 }
