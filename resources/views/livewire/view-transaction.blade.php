@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('components.layouts.app')
 @section('css')
     <style>
         #table {     

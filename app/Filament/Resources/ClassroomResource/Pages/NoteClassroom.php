@@ -8,7 +8,6 @@ use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 
 class NoteClassroom extends Page
 {
-
     use InteractsWithRecord;
 
     protected static string $resource = ClassroomResource::class;
