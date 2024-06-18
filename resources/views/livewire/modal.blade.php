@@ -6,7 +6,7 @@
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 class="text-xl text-center font-semibold text-gray-900 dark:text-white">
-                    Enregistrement des notes:  {{ $course ? ucfirst($course['name']) : '' }}
+                    Enregistrement des notes: {{ $course ? ucfirst($course['name']) : '' }}
                 </h3>
                 <button wire:click="hide" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="default-modal">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
@@ -15,32 +15,40 @@
                     <span class="sr-only">Close modal</span>
                 </button>
             </div>
+            @if (session()->has('message'))
+                <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" class="bg-green-500 p-2 mb-4">
+                    {{ session('message') }}
+                </div>
+            @endif
             <!-- Modal body -->
-            <div class="p-4 md:p-5 space-y-4">
-                <table class="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-400">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                        <tr>
-                            <th scope="col">Noms et Prénoms</th>
-                            <th scope="col">Note{{ $seq ? '('.$seq['name'].')' : '' }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($students as $student)
+            <form wire:submit.prevent="save">
+                <div class="p-4 md:p-5 space-y-4">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <td>{{ $student['name'] }}</td>
-                                <td>
-                                    <input type="number" value="{{ $student['value'] }}" />
-                                </td>
+                                <th scope="col">Noms et Prénoms</th>
+                                <th scope="col">Note{{ $seq ? '('.$seq['name'].')' : '' }}</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <!-- Modal footer -->
-            <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                <button data-modal-hide="default-modal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">I accept</button>
-                <button data-modal-hide="default-modal" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" wire:click="hide">Decline</button>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach($students as $index => $student)
+                                <tr wire:key="tr-{{ $index }}">
+                                    <td>{{ $student['name'] }}</td>
+                                    <td wire:key="field-{{ $index }}">
+                                        <input type="number" wire:model="form.{{ $index }}.value" @if(!$seq['status']) disabled @endif />
+                                        <input type="hidden" value="{{ $student['id'] }}" wire:model="form.{{ $index }}.policy" />
+                                    </td>
+                                </tr>
+                            @endforeach 
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Modal footer -->
+                <div class="flex items-center gap-x-3 p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <button type="submit" class="py-2.5 px-2.5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">Enregistrer</button>
+                    <button type="button" class="py-2.5 px-2.5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" wire:click="hide">Fermer</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use App\Models\{ Sequence, Classroom, Note };
 use App\Filament\Traits\ActiveYear;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class ViewNote extends Component
 {
@@ -24,6 +25,7 @@ class ViewNote extends Component
     public $course;
     public $seq;
     public $students = [];
+    public $form = [];
 
     public function mount($record)
     {
@@ -32,6 +34,8 @@ class ViewNote extends Component
         $this->sequences = Sequence::where('academic_id', $this->academicYear->id)->get();
 
         $this->record = $record;
+
+        //$this->fields = [['value' => '', 'policy' => '']];
     }
 
     public function show($course, $seq)
@@ -48,7 +52,7 @@ class ViewNote extends Component
 
         $result = collect([]);
 
-        foreach($data as $student) {
+        foreach($data as $index => $student) {
 
             $note = Note::where('classroom_student_id', $student->pivot->id)
                         ->where('course_id', $course['id'])
@@ -60,6 +64,9 @@ class ViewNote extends Component
                 'name' => $student->lname . ' ' . $student->fname,
                 'value' => $note ?  $note->value : 0,
             ]);
+
+            $this->form[$index]['policy'] = $student->pivot->id;
+            $this->form[$index]['value'] = $note ?  $note->value : 0;
         }
         
         $this->students = $result;
@@ -68,6 +75,30 @@ class ViewNote extends Component
     public function hide()
     {
         $this->isOpen = false;
+    }
+
+    public function save() {
+
+        DB::transaction(function () {
+        
+            foreach ($this->form as $item) {
+
+                Note::updateOrCreate(
+                    [
+                        "classroom_student_id" => $item['policy'],
+                        "sequence_id" => $this->seq['id'], 
+                        "course_id" => $this->course['id']
+                    ],
+                    [
+                        "value" => $item['value']
+                    ]
+                );
+
+            }
+
+        });
+
+        session()->flash('message', 'Enregistrement reussie');
     }
 
     public function render()
