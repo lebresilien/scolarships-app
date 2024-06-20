@@ -148,7 +148,8 @@ class ClassroomStudentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\TransactionsRelationManager::class
+            RelationManagers\TransactionsRelationManager::class,
+            RelationManagers\AbsencesRelationManager::class,
         ];
     }
 

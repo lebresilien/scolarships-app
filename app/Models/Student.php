@@ -90,4 +90,11 @@ class Student extends Model
                     ->first()
                     ->transactions();
     }
+
+    public function absences() {
+        return $this->hasMany(ClassroomStudent::class)
+                    ->where('academic_id', Academic::where('status', true)->first()->id)
+                    ->first()
+                    ->absences();
+    }
 }
