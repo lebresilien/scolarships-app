@@ -24,7 +24,32 @@ class ClassroomStudentResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\Select::make('classroom_id')
+                            ->label('Classe')
+                            //->options(Classroom::query()->pluck('name', 'id'))
+                            ->options(function ($record, Forms\Set $set) { 
+                                if (! empty($record)) {
+                                    $set('classroom_id', $record->current_classroom->id);
+                                } 
+                                return Classroom::query()->pluck('name', 'id');
+                            })
+                            ->required(),
+                        Forms\Components\Select::make('academic_id')
+                            ->label('Année Académique')
+                            ->options(function ($record, Forms\Set $set) { 
+                                if (! empty($record)) {
+                                    $set('academic_id', $record->classrooms[0]->pivot->academic_id);
+                                } 
+                                return Academic::query()->pluck('name', 'id');
+                            })
+                            ->required(),
+                        Forms\Components\Toggle::make('status'),
+                        Forms\Components\TextInput::make('name')
+                            ->label('Noms et Prénoms')
+                            ->disabled()
+                    ]) 
             ]);
     }
 
@@ -73,15 +98,14 @@ class ClassroomStudentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    //Tables\Actions\EditAction::make()
                     Tables\Actions\Action::make('Editer')
-                    ->icon('heroicon-s-pencil-square')
-                    ->fillForm(fn (Student $record): array => [
+                     ->fillForm(fn (Student $record): array => [
                         'classroom_id' => $record->current_classroom->id,
                         'academic_id' => $record->classrooms[0]->pivot->academic_id,
                         'status' => $record->status,
                         'name' => $record->fname . ' ' . $record->fname,
-                    ])
+                    ]) 
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([

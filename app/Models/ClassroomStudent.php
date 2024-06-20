@@ -20,4 +20,8 @@ class ClassroomStudent extends Model
     public function notes() {
         return $this->hasMany(Note::class);
     }
+
+    public function absences() {
+        return $this->hasMany(Absence::class);
+    }
 }
