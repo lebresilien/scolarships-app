@@ -13,7 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Select;
+//use Filament\Forms\Components\Select;
 use App\Livewire\ViewNote;
 use Livewire\Livewire;
 use Filament\Actions\StaticAction;
@@ -31,17 +31,20 @@ class ClassroomResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->required()->unique(),
-                Select::make('user_id')
-                ->relationship('User', 'name')
-                ->required(),
-                Select::make('building_id')
-                ->relationship('Building', 'name')
-                ->required(),
-                Select::make('group_id')
-                ->relationship('Group', 'name')
-                ->required(),
-                Forms\Components\Textarea::make('description')->columnSpan(2)
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->unique(),
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->required(),
+                Forms\Components\Select::make('building_id')
+                    ->relationship('building', 'name')
+                    ->required(),
+                Forms\Components\Select::make('group_id')
+                    ->relationship('group', 'name')
+                    ->required(),
+                Forms\Components\Textarea::make('description')
+                    ->columnSpan(2)
             ]);
     }
 

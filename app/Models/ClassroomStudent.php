@@ -24,4 +24,8 @@ class ClassroomStudent extends Model
     public function absences() {
         return $this->hasMany(Absence::class);
     }
+
+    public function courses() {
+        return $this->hasMany(Absence::class);
+    }
 }

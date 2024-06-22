@@ -29,7 +29,7 @@ class Student extends Model
 
     protected $dates = [ 'deleted_at' ];
 
-    protected $with = ['classrooms'];
+    //protected $with = ['classrooms'];
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',

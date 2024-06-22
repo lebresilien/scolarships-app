@@ -13,6 +13,7 @@ class Absence extends Model
     protected $fillable = [
         'classroom_student_id',
         'course_id',
+        'sequence_id',
         'day',
         'justify_hour',
         'justify',
