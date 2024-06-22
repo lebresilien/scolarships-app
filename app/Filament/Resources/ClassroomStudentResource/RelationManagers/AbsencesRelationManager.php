@@ -22,7 +22,9 @@ class AbsencesRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('classroom_id')
-                    ->relationship('Classrooms', 'name')
+                    ->options(function (RelationManager $livewire) {
+                        return Course::whereIn('teaching_unit_id', $livewire->getOwnerRecord()->current_classroom->group->teachings->pluck('id'))->get()->pluck('name', 'id');
+                    })
                     ->required(),
                 Forms\Components\Select::make('sequence_id')
                         ->label('Sequence')
@@ -36,9 +38,19 @@ class AbsencesRelationManager extends RelationManager
                     ->label('Nombre d\'heures')
                     ->integer()
                     ->required(),
+                Forms\Components\Toggle::make('status')
+                    ->label('Justifié')
+                    ->reactive()
+                    ->hiddenOn('create')
+                    ->afterStateUpdated(fn (Toggle $component) => $component->getContainer()
+                    ->getComponent('justify')
+                    ->hidden(!$component->getState()) // Show if toggle is true, hide otherwise
+                ),
                 Forms\Components\RichEditor::make('justify')
                     ->label('Justificatif')
                     ->required()
+                    ->hidden()
+                    ->columnSpanFull()
             ]);
     }
 
