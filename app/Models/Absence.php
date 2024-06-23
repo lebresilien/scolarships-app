@@ -15,6 +15,7 @@ class Absence extends Model
         'course_id',
         'sequence_id',
         'day',
+        'hour',
         'justify_hour',
         'justify',
         'status'
@@ -22,5 +23,13 @@ class Absence extends Model
 
     public function policy() {
         return $this->belongsTo(ClassroomStudent::class);
+    }
+
+    public function course() {
+        return $this->belongsTo(Course::class);
+    }
+
+    public function sequence() {
+        return $this->belongsTo(Sequence::class);
     }
 }

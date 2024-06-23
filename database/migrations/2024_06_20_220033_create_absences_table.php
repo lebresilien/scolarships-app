@@ -18,7 +18,7 @@ return new class extends Migration
             $table->datetime('day');
             $table->integer('justify_hour')->default(0);
             $table->text('justify')->nullable();
-            $table->boolean('status')->default(true);
+            $table->boolean('status')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('absents');
+        Schema::dropIfExists('absences');
     }
 };

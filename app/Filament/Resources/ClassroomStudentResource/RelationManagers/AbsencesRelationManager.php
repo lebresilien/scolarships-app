@@ -21,7 +21,7 @@ class AbsencesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('classroom_id')
+                Forms\Components\Select::make('course_id')
                     ->options(function (RelationManager $livewire) {
                         return Course::whereIn('teaching_unit_id', $livewire->getOwnerRecord()->current_classroom->group->teachings->pluck('id'))->get()->pluck('name', 'id');
                     })
@@ -34,22 +34,25 @@ class AbsencesRelationManager extends RelationManager
                     ->label('Date')
                     ->seconds(false) 
                     ->required(),
-                Forms\Components\TextInput::make('day')
+                Forms\Components\TextInput::make('hour')
                     ->label('Nombre d\'heures')
                     ->integer()
                     ->required(),
                 Forms\Components\Toggle::make('status')
                     ->label('Justifié')
-                    ->reactive()
-                    ->hiddenOn('create')
-                    ->afterStateUpdated(fn (Toggle $component) => $component->getContainer()
-                    ->getComponent('justify')
-                    ->hidden(!$component->getState()) // Show if toggle is true, hide otherwise
-                ),
+                    ->live()
+                    ->hiddenOn('create'),
+                Forms\Components\TextInput::make('justify_hour')
+                    ->label('Nombre d\'heures justifiées')
+                    ->integer()
+                    ->required(fn ($get): bool => filled($get('status')))
+                    ->visible(fn ($get): bool =>  $get('status') === true)
+                    ->lte('hour')
+                    ->columnSpanFull(),
                 Forms\Components\RichEditor::make('justify')
                     ->label('Justificatif')
-                    ->required()
-                    ->hidden()
+                    ->required(fn ($get): bool => filled($get('status')))
+                    ->visible(fn ($get): bool =>  $get('status') === true)
                     ->columnSpanFull()
             ]);
     }
@@ -59,7 +62,16 @@ class AbsencesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('course_id')
             ->columns([
-                Tables\Columns\TextColumn::make('course_id'),
+                Tables\Columns\TextColumn::make('course.name')
+                    ->label('Cours'),
+                Tables\Columns\TextColumn::make('sequence.name')
+                    ->label('Sequence'),
+                Tables\Columns\TextColumn::make('day')
+                    ->label('Date et Heure'),
+                Tables\Columns\TextColumn::make('hour')
+                    ->label('Nombre d\'heures'),
+                Tables\Columns\TextColumn::make('justify_hour')
+                    ->label('Nombre d\'heures justifiées'),
             ])
             ->filters([
                 //
@@ -68,8 +80,11 @@ class AbsencesRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\ViewAction::make()
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
