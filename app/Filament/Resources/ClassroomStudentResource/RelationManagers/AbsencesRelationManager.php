@@ -81,7 +81,8 @@ class AbsencesRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->disabled(fn ($record): bool => $record->status),
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\ViewAction::make()
                 ])
