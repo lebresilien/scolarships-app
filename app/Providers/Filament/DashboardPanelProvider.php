@@ -17,6 +17,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use App\Filament\Resources\SequenceResource\Widgets\StatsOverview;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -39,6 +40,7 @@ class DashboardPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                StatsOverview::class
             ])
             ->middleware([
                 EncryptCookies::class,

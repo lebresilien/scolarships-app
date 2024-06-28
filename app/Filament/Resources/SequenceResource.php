@@ -57,7 +57,11 @@ class SequenceResource extends Resource
                     ->relationship('academic', 'name')
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('Dashbord')
+                        ->url(fn ($record) => url('dashboard/sequences/'.$record->id.'/dashboard'))
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -81,6 +85,7 @@ class SequenceResource extends Resource
             'index' => Pages\ListSequences::route('/'),
             'create' => Pages\CreateSequence::route('/create'),
             'edit' => Pages\EditSequence::route('/{record}/edit'),
+            'dashboard' => Pages\SequenceDashboard::route('/{record}/dashboard')
         ];
     }
 
