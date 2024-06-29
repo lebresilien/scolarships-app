@@ -2,5 +2,5 @@
   
     @livewire(\App\Filament\Resources\SequenceResource\Widgets\StatsOverview::class, ['record' => $record])
  
-    {{ $record }}
+    {{ $this->table }} 
 </x-filament-panels::page>
