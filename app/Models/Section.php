@@ -25,7 +25,10 @@ class Section extends Model
 
     public function notes()
     {
-        return $this->hasManyDeep(Note::class, [Group::class, Classroom::class]);
+        return $this->hasManyDeep(Note::class, [
+            Group::class, 
+            Classroom::class
+        ]);
     }
 
     public function scopeFilter($query, array $filters)

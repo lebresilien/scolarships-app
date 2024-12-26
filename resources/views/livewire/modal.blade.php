@@ -26,15 +26,15 @@
                     <table class="w-full text-sm text-left rtl:text-right text-gray-900 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col">Noms et Prénoms</th>
-                                <th scope="col">Note{{ $seq ? '('.$seq['name'].')' : '' }}</th>
+                                <th scope="col" style="padding-top: 20px; padding-bottom: 20px;">Noms et Prénoms</th>
+                                <th scope="col" style="padding-top: 20px; padding-bottom: 20px;">Note{{ $seq ? '('.$seq['name'].')' : '' }}</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="">
                             @foreach($students as $index => $student)
                                 <tr wire:key="tr-{{ $index }}">
-                                    <td>{{ $student['name'] }}</td>
-                                    <td wire:key="field-{{ $index }}">
+                                    <td style="padding-top: 10px; padding-bottom: 10px">{{ $student['name'] }}</td>
+                                    <td style="padding-top: 10px; padding-bottom: 10px" wire:key="field-{{ $index }}">
                                         <input type="number" wire:model="form.{{ $index }}.value" @if(!$seq['status']) disabled @endif />
                                         <input type="hidden" value="{{ $student['id'] }}" wire:model="form.{{ $index }}.policy" />
                                     </td>

@@ -11,8 +11,8 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
 use App\Models\{ Sequence, Classroom, Note };
 use App\Filament\Traits\ActiveYear;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Filament\Notifications\Notification;
 
 class ViewNote extends Component
 {
@@ -23,7 +23,7 @@ class ViewNote extends Component
     protected $academicYear;
     public $isOpen = false;
     public $course;
-    public $seq;
+    public $sequence;
     public $students = [];
     public $form = [];
 
@@ -34,21 +34,19 @@ class ViewNote extends Component
         $this->sequences = Sequence::where('academic_id', $this->academicYear->id)->get();
 
         $this->record = $record;
-
-        //$this->fields = [['value' => '', 'policy' => '']];
     }
 
     public function show($course, $seq)
     {
         $this->isOpen = true;
         $this->course = $course;
-        $this->seq = $seq; 
-        
+        $this->sequence = $seq;
+        $this->dispatch('open-modal', id: 'modal');
+
         $data = $this->record->students()
                             ->wherePivot('academic_id', $this->active()->id)
                             ->wherePivot('status', true)
                             ->get();
-        //dd($data);
 
         $result = collect([]);
 
@@ -58,7 +56,7 @@ class ViewNote extends Component
                         ->where('course_id', $course['id'])
                         ->where('sequence_id', $seq['id'])
                         ->first();
-            
+
             $result->push([
                 'id' =>  $student->pivot->id,
                 'name' => $student->lname . ' ' . $student->fname,
@@ -68,25 +66,25 @@ class ViewNote extends Component
             $this->form[$index]['policy'] = $student->pivot->id;
             $this->form[$index]['value'] = $note ?  $note->value : 0;
         }
-        
+
         $this->students = $result;
     }
 
     public function hide()
     {
-        $this->isOpen = false;
+        $this->dispatch('close-modal', id: 'modal');
     }
 
     public function save() {
 
         DB::transaction(function () {
-        
+
             foreach ($this->form as $item) {
 
                 Note::updateOrCreate(
                     [
                         "classroom_student_id" => $item['policy'],
-                        "sequence_id" => $this->seq['id'], 
+                        "sequence_id" => $this->sequence['id'],
                         "course_id" => $this->course['id']
                     ],
                     [
@@ -98,7 +96,12 @@ class ViewNote extends Component
 
         });
 
-        session()->flash('message', 'Enregistrement reussie');
+        //session()->flash('message', 'Enregistrement reussie');
+        Notification::make()
+            ->success()
+            ->title('Opération réussie')
+            ->body('Notes enregistrées.')
+            ->send();
     }
 
     public function render()

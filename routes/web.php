@@ -15,4 +15,4 @@ Route::get('routes', function () {
 })->name('trx');
 
 Route::get('dashboard/notes/{classroom_id}', ViewNote::class)->name('classrooms.notes');
-Route::get('pdf/{student}', PdfController::class)->name('pdf');
+Route::get('report/{student}/{seq}', PdfController::class)->name('report');

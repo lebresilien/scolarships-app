@@ -29,4 +29,12 @@ class TeachingUnit extends Model
     public function courses() {
         return $this->hasMany(Course::class);
     }
+
+    public function getCoefficientAttribute(): int {
+        $coeff = 0;
+        foreach($this->courses as $course) {
+            $coeff += $course->coefficient;
+        }
+        return $coeff;
+    }
 }

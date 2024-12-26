@@ -5,9 +5,8 @@ namespace App\Filament\Resources\StudentResource\Pages;
 use App\Filament\Resources\StudentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
-use App\Models\{Transaction, Student};
+use App\Models\{ Transaction, Student, ClassroomStudent };
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use App\Filament\Traits\ActiveYear;
 use Illuminate\Support\Facades\DB;
 
@@ -24,10 +23,22 @@ class CreateStudent extends CreateRecord
         $model = DB::transaction(function () use ($data) {
             
             $student = Student::create($data);
-            $student->classrooms()->attach($data['classroom_id'], ['academic_id' => $this->active()->id]);
-            
+
+            $policy = ClassroomStudent::create([
+                'student_id' => $student->id,
+                'classroom_id' => $data['classroom_id'],
+                'academic_id' => $this->active()->id,
+                'state' => $data['state']
+            ]);
+
+           /* $student->classrooms()->attach($data['classroom_id'], 
+            [
+                'academic_id' => $this->active()->id,
+                'state' => $data['state']
+            ]); */
+
             $transaction = Transaction::create([
-                'classroom_student_id' => $this->active()->id,
+                'classroom_student_id' => $policy->id,
                 'name' => 'Inscription',
                 'amount' => $data['amount']
             ]);
@@ -39,7 +50,7 @@ class CreateStudent extends CreateRecord
     }
 
     protected function getCreatedNotificationTitle(): ?string {
-        return 'User registered';
+        return 'Apprenant Enregistré';
     }
 
     protected function getRedirectUrl(): string {

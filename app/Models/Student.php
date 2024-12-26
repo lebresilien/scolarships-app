@@ -36,7 +36,7 @@ class Student extends Model
     ];
 
     public function classrooms() {
-        return $this->belongsToMany(Classroom::class)->withPivot('academic_id', 'status', 'id');
+        return $this->belongsToMany(Classroom::class)->withPivot('academic_id', 'status', 'id', 'state');
     }
 
     public function notes() {
@@ -62,19 +62,34 @@ class Student extends Model
 
     public function getStatusAttribute()
     {
-        return $this->classrooms()->where('academic_id' , Academic::where('status', true)->first()->id)->first()->pivot->status;
+        return $this->classrooms()->where('academic_id', $this->academic()->id)->first()->pivot->status;
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->fname . ' ' . $this->lname;
+    }
+
+    public function getStateAttribute()
+    {
+        return $this->classrooms()->where('academic_id', $this->academic()->id)->first()->pivot->state;
+    }
+
+    public function getPolicyAttribute()
+    {
+        return $this->classrooms()->where('academic_id', $this->academic()->id)->first()->pivot->id;
     }
 
     public function getCurrentClassroomAttribute(): Classroom
     {
-        return $this->classrooms()->where('academic_id' , Academic::where('status', true)->first()->id)->first();
+        return $this->classrooms()->where('academic_id', $this->academic()->id)->first();
     }
 
     public function getCurrentAmountAttribute(): int
     {
         $amount = 0;
 
-        $policy_id = $this->classrooms()->where('academic_id' , Academic::where('status', true)->first()->id)->first()->pivot->id;
+        $policy_id = $this->classrooms()->where('academic_id', $this->academic()->id)->first()->pivot->id;
         $policy = \App\Models\ClassroomStudent::find($policy_id);
         
         foreach($policy->transactions as $trx) {
@@ -85,16 +100,20 @@ class Student extends Model
     }
 
     public function transactions() {
-        return $this->hasMany(ClassroomStudent::class)
-                    ->where('academic_id', Academic::where('status', true)->first()->id)
-                    ->first()
-                    ->transactions();
+        $data = $this->hasMany(ClassroomStudent::class)
+                    ->where('academic_id', $this->academic()->id)
+                    ->first();
+        return $data ? $data->transactions() : [];
     }
 
     public function absences() {
-        return $this->hasMany(ClassroomStudent::class)
-                    ->where('academic_id', Academic::where('status', true)->first()->id)
-                    ->first()
-                    ->absences();
+        $data = $this->hasMany(ClassroomStudent::class)
+                    ->where('academic_id', $this->academic()->id)
+                    ->first();
+        return $data ? $data->absences() : [];
+    }
+
+    public function academic() {
+        return Academic::where('status', true)->first();
     }
 }

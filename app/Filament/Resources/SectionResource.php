@@ -19,6 +19,8 @@ class SectionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Configurations';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -77,5 +79,10 @@ class SectionResource extends Resource
     public function isTableSearchable(): bool
     {
         return true;
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

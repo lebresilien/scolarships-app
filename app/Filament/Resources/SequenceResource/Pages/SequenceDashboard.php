@@ -11,6 +11,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms;
 use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Support\Facades\Log;
 
 class SequenceDashboard extends Page implements Tables\Contracts\HasTable
 {
@@ -41,7 +42,7 @@ class SequenceDashboard extends Page implements Tables\Contracts\HasTable
                 ->label('PDF')
                 ->color('primary')
                 ->icon('heroicon-s-cloud-arrow-down')
-                ->url(fn ($record) => route('pdf', $record))
+                ->url(fn ($record) => route('report', ['student' => $record, 'seq' => $this->record]))
         ];
     }
 

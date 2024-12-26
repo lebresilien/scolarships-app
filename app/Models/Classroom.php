@@ -41,4 +41,9 @@ class Classroom extends Model
     public function user() {
         return $this->belongsTo(User::class);
     }
+
+    public function getCountStudentAttribute(): int
+    {
+        return $this->students()->where('academic_id', Academic::where('status', true)->first()->id)->count();
+    }
 }

@@ -18,6 +18,8 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Resources\SequenceResource\Widgets\StatsOverview;
+use App\Filament\Widgets\DashboardOverview;
+use App\Filament\Widgets\DashboardTransactionOverview;
 
 class DashboardPanelProvider extends PanelProvider
 {
@@ -40,7 +42,9 @@ class DashboardPanelProvider extends PanelProvider
             ->widgets([
                 //Widgets\AccountWidget::class,
                 //Widgets\FilamentInfoWidget::class,
-                //StatsOverview::class
+                //StatsOverview::class,
+                //DashboardOverview::class,
+                //DashboardTransactionOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,

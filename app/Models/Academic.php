@@ -24,6 +24,10 @@ class Academic extends Model
         return $this->hasMany(Sequence::class);
     }
 
+    public function policies() {
+        return $this->hasMany(ClassroomStudent::class);
+    }
+
     protected $casts = [
         'created_at' => 'datetime:Y-m-d',
         'status' => 'boolean'

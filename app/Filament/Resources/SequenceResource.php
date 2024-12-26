@@ -19,6 +19,8 @@ class SequenceResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Notes';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -95,5 +97,10 @@ class SequenceResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

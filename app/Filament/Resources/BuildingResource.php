@@ -19,6 +19,8 @@ class BuildingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Configurations';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -72,5 +74,10 @@ class BuildingResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

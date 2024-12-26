@@ -22,6 +22,10 @@ class StudentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static ?string $label = 'Apprénants';
+
+    protected static ?string $navigationGroup = 'Elèves';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -66,6 +70,10 @@ class StudentResource extends Resource
                             ->required()
                             ->visibleOn('create')
                             ->numeric(),
+                        Forms\Components\Toggle::make('state')
+                            ->label('Redouble ?')
+                            ->default(0)
+                            ->hiddenOn('edit'),
                         Forms\Components\RichEditor::make('description')
                             ->columnSpanfull()
                             ->label('Description && Allergies')
@@ -122,13 +130,38 @@ class StudentResource extends Resource
                 Tables\Filters\Filter::make('academic_id')
                     ->form([
                         Forms\Components\Select::make('value')
-                        ->options(Academic::all()->pluck('name', 'id'))
+                            ->label('Année Académique')
+                            ->options(Academic::all()->pluck('name', 'id'))
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
                                 $data['value'],
                                 fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('academic_id', $value)),
+                            );
+                }),
+                Tables\Filters\Filter::make('state')
+                ->form([
+                    Forms\Components\Toggle::make('state')
+                        ->label('Redoublant')
+                ])
+                ->query(function (Builder $query, array $data): Builder {
+                    return $query
+                        ->when(
+                            $data['state'],
+                            fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('state', $value)),
+                        );
+                }),
+                Tables\Filters\Filter::make('status')
+                    ->form([
+                        Forms\Components\Toggle::make('status')
+                            ->label('Démissionaire')
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['status'],
+                                fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('status', $value)),
                             );
                     })
             ])
@@ -156,6 +189,15 @@ class StudentResource extends Resource
                                 Forms\Components\TextInput::make('amount')
                                     ->label('Montant')
                                     ->numeric()
+                                    ->required(),
+                                Forms\Components\Radio::make('state')
+                                    ->options([
+                                        1 => 'Oui',
+                                        0 => 'Non',
+                                    ])
+                                    ->label('Redouble ?')
+                                    ->inline()
+                                    ->default(0)
                                     ->required()
                             ])
                     ])
@@ -174,7 +216,8 @@ class StudentResource extends Resource
                         } else {
 
                             $register = $student->classrooms()->attach($data['classroom_id'], [
-                                'academic_id' => Academic::where('status', true)->first()->id
+                                'academic_id' => Academic::where('status', true)->first()->id,
+                                'state' => $data['state']
                             ]);
                         
                             Transaction::create([
@@ -223,5 +266,10 @@ class StudentResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

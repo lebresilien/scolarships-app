@@ -20,6 +20,10 @@ class CourseResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    public static ?string $label = 'Cours';
+
+    protected static ?string $navigationGroup = 'Enseignements';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -95,5 +99,10 @@ class CourseResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

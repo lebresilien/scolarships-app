@@ -13,7 +13,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-//use Filament\Forms\Components\Select;
 use App\Livewire\ViewNote;
 use Livewire\Livewire;
 use Filament\Actions\StaticAction;
@@ -26,6 +25,10 @@ class ClassroomResource extends Resource
     protected static ?string $model = Classroom::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $label = 'Salle de classe';
+
+    protected static ?string $navigationGroup = 'Notes';
 
     public static function form(Form $form): Form
     {
@@ -66,6 +69,7 @@ class ClassroomResource extends Resource
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\Action::make('Notes')
                         ->icon('heroicon-o-list-bullet')
+                        ->url(fn ($record) => url('dashboard/classrooms/'.$record->id.'/notes'))
                 ])
             ])
             ->bulkActions([
@@ -100,5 +104,10 @@ class ClassroomResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }
