@@ -24,10 +24,10 @@
       </x-slot>
 
       <x-slot name="description">
-         {{ $course ? ucfirst($course['name']).'('.$sequence['name'].')' : '' }}
+         {{ $course ? ucfirst($course['name']).'('.$se['name'].')' : '' }}
       </x-slot>
-
-      @if(!$sequence->status)
+   
+      @if($se && !$se['status'])
          <div class="flex items-center p-2 mb-1 gap-x-2 text-sm rounded-lg" role="alert" style="background-color: rgb(254 252 232); color: rgb(202 138 4);">
             <x-filament::icon
                icon="heroicon-o-information-circle"
@@ -53,17 +53,17 @@
                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $student['name'] }}</td>
                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" wire:key="field-{{ $index }}">
                         <input type="hidden" value="{{ $student['id'] }}" wire:model="form.{{ $index }}.policy" />
-                           @if($sequence->status) 
+                           @if($se && $se['status'])
                               <x-filament::input.wrapper>
                                  <x-filament::input
-                                    type="text"
+                                    type="number"
                                     wire:model="form.{{ $index }}.value"
                                  />
                               </x-filament::input.wrapper>
                            @else
                               <x-filament::input.wrapper>
                                  <x-filament::input
-                                    type="text"
+                                    type="number"
                                     wire:model="form.{{ $index }}.value"
                                     disabled
                                  />
@@ -77,7 +77,7 @@
       </form>
       <x-slot name="footerActions">
          <div class="flex justify-end gap-x-2 w-full">
-         @if($sequence->status)
+         @if($se && $se['status'])
             <x-filament::button wire:click="save">
                Enregistrer
             </x-filament::button>

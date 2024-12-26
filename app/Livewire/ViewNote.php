@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use App\Models\{ Sequence, Classroom, Note };
 use App\Filament\Traits\ActiveYear;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Filament\Notifications\Notification;
 
 class ViewNote extends Component
@@ -23,7 +24,7 @@ class ViewNote extends Component
     protected $academicYear;
     public $isOpen = false;
     public $course;
-    public $sequence;
+    public $se;
     public $students = [];
     public $form = [];
 
@@ -37,10 +38,11 @@ class ViewNote extends Component
     }
 
     public function show($course, $seq)
-    {
+    { 
         $this->isOpen = true;
         $this->course = $course;
-        $this->sequence = $seq;
+        $this->se = $seq;
+        
         $this->dispatch('open-modal', id: 'modal');
 
         $data = $this->record->students()
@@ -77,31 +79,51 @@ class ViewNote extends Component
 
     public function save() {
 
-        DB::transaction(function () {
+        $error = false;
 
-            foreach ($this->form as $item) {
-
-                Note::updateOrCreate(
-                    [
-                        "classroom_student_id" => $item['policy'],
-                        "sequence_id" => $this->sequence['id'],
-                        "course_id" => $this->course['id']
-                    ],
-                    [
-                        "value" => $item['value']
-                    ]
-                );
-
+        foreach($this->form as $item) {
+            if($item['value'] > 20) {
+                $error = true;
             }
+        }
 
-        });
+        if($error) {
+            Notification::make()
+                ->danger()
+                ->title('Erreur')
+                ->body('Une note superieure à 20 a été detectée.')
+                ->send();
+        } else 
+        {
+            DB::transaction(function () {
 
-        //session()->flash('message', 'Enregistrement reussie');
-        Notification::make()
-            ->success()
-            ->title('Opération réussie')
-            ->body('Notes enregistrées.')
-            ->send();
+                foreach ($this->form as $item) {
+    
+                    
+                    Note::updateOrCreate(
+                        [
+                            "classroom_student_id" => $item['policy'],
+                            "sequence_id" => $this->se['id'],
+                            "course_id" => $this->course['id']
+                        ],
+                        [
+                            "value" => $item['value']
+                        ]
+                    );
+    
+                }
+    
+                $this->hide();
+    
+            });
+    
+            Notification::make()
+                ->success()
+                ->title('Opération réussie')
+                ->body('Notes enregistrées.')
+                ->send();
+        }
+
     }
 
     public function render()
