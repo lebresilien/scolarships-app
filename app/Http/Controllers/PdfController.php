@@ -32,8 +32,7 @@ class PdfController extends Controller
                 $range++;
             }
         }
-        //dd($averageGrades);
-        //Log::info(Sequence::find($seq)->notes->whereIn('course_id', )->groupBy('classroom_student_id'));
+        
         return view('pdf', [
             'record' => $student,
             'seq' => Sequence::find($seq),
