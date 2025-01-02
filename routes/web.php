@@ -15,4 +15,5 @@ Route::get('routes', function () {
 })->name('trx');
 
 Route::get('dashboard/notes/{classroom_id}', ViewNote::class)->name('classrooms.notes');
-Route::get('report/{student}/{seq}', PdfController::class)->name('report');
+Route::get('report/{student}/{seq}', [PdfController::class, 'sequence'])->name('report');
+Route::get('trimester-report/{student}/{trimester}', [PdfController::class, 'trimester'])->name('trimester-report');

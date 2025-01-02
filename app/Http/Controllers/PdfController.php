@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{ Sequence, Student, ClassroomStudent, Classroom };
+use App\Models\{ Sequence, Student, ClassroomStudent, Classroom, Trimester, Note };
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Filament\Traits\ActiveYear;
@@ -14,7 +14,7 @@ class PdfController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function __invoke(Student $student, string $seq)
+    public function sequence(Student $student, string $seq)
     {
         $classroom = Classroom::find($student->current_classroom->id);
 
@@ -28,12 +28,12 @@ class PdfController extends Controller
         $range = 1;
         
         foreach($averageGrades as $item) {
-            if($averageGrades->where('classroom_student_id', $student->policy)->first()->average > $item->average) {
+            if($item->average > $averageGrades->where('classroom_student_id', $student->policy)->first()->average) {
                 $range++;
             }
         }
         
-        return view('pdf', [
+        return view('pdf.sequence', [
             'record' => $student,
             'seq' => Sequence::find($seq),
             'policy' => ClassroomStudent::find($student->policy),
@@ -41,4 +41,62 @@ class PdfController extends Controller
             'range' => $range
         ]);
     }
+
+    public function trimester(Student $student, Trimester $trimester)
+    {
+        $classroom = Classroom::find($student->current_classroom->id);
+        $id_array = [];
+        foreach($trimester->sequence as $item) {
+            array_push($id_array, $item['sequence']);
+        }
+
+        $averageGrades = DB::table('notes')
+                            ->select('classroom_student_id', DB::raw('(SUM(value * courses.coefficient) / SUM(courses.coefficient)) as average'))
+                            ->whereIn('sequence_id', [1, 3])
+                            ->whereIn('classroom_student_id', $classroom->students->where('pivot.academic_id', $this->active()->id)->pluck('pivot.id'))
+                            ->join('courses', 'courses.id', '=', 'notes.course_id')
+                            ->groupBy('classroom_student_id')
+                            ->get();
+
+        $range = 1;
+        
+        foreach($averageGrades as $item) {
+            if($item->average > $averageGrades->where('classroom_student_id', $student->policy)->first()->average) {
+                $range++;
+            }
+        }
+
+        return view('pdf.trimester', [
+            'record' => $student,
+            'seq' => $trimester,
+            'policy' => ClassroomStudent::find($student->policy),
+            'statistics' => $averageGrades,
+            'range' => $range   
+        ]);
+    }
+
+    public function calculerMoyenneTrimestrielle($classroom_student_id, $sequence_id)
+    {
+
+        // Récupérer les notes de l'étudiant pour ces séquences
+        $notes = Note::where('classroom_student_id', $classroom_student_id)
+            ->whereIn('sequence_id', $sequence_id)
+            ->get();
+
+        // Calcul de la moyenne pondérée
+        $totalValeurCoefficient = 0;
+        $totalCoefficient = 0;
+
+        foreach ($notes as $note) {
+            $totalValeurCoefficient += $note->value * $note->course->coefficient;
+            $totalCoefficient += $note->course->coefficient;
+        }
+
+        if ($totalCoefficient == 0) {
+            return null; // Pas de coefficient, donc pas de moyenne
+        }
+
+        return $totalValeurCoefficient / $totalCoefficient;
+    }
+
 }

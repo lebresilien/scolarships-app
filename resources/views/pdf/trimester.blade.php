@@ -120,110 +120,28 @@
                     $semester_range = 0;
                 @endphp
                 @foreach($record['current_classroom']['group']['teachings'] as $teaching)
-                    @if(count($teaching['courses']) > 0 )
-                        @php
-                            $total_teaching = 0;
-                            $total_coefficient = 0;
-                            $policies = $seq->notes->where('classroom_student_id', '<>', $record->policy)->whereIn('course_id', $teaching['courses']->pluck('id'))->pluck('classroom_student_id');
-                            $notes = $seq->notes->where('classroom_student_id', '<>', $record->policy)->whereIn('course_id', $teaching['courses']->pluck('id'))->groupBy('classroom_student_id');
-                            $array_notes = [];
-                            $ut_average = 0;
-                            //dd(array_unique($policies->toArray()));
-                            foreach(array_unique($policies->toArray()) as $value) {
-                                $notes = $seq->notes->where('classroom_student_id', $value)->whereIn('course_id', $teaching['courses']->pluck('id'));
-                                $ut_average = 0;
-                                foreach($notes as $note) {
-                                    // save unit teaching note to array
-                                    $ut_average += $note['value'] * $note->course->coefficient;
-                                }
-                                array_push($array_notes, $ut_average / $teaching->coefficient);
-                            }
-                            
-                        @endphp
+                    @if(count($teaching['courses']) > 0)
                         @foreach($teaching['courses'] as $course)
                             <tr>
                                 <td style="border: 1px solid black; text-align: left; text-transform: capitalize">{{ $course['name'] }}</td>
-                                <td style="border: 1px solid black; text-align: right">{{ $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first()->value : 0 }}</td>
-                                <td style="border: 1px solid black; text-align: right">{{ $course['coefficient'] }}</td>
-                                <td style="border: 1px solid black; text-align: right">{{ $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first()->value * $course['coefficient']  : 0 }}</td>
-                                <td style="border: 1px solid black; text-align: right">
-                                    @php
-                                        $position = 1;
-                                        $val = $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first()->value : 0;
-                                        $course_notes = $seq->notes()->where('course_id', $course['id'])->get();
-                                        foreach($course_notes as $item) {
-                                            if($item->value > $val) {
-                                                $position++;
-                                            }
-                                        }
-                                        echo $position;
-                                        $total_teaching += $val * $course['coefficient'];
-                                        $total_coefficient += $course['coefficient']; 
-                                    @endphp
-                                </td>
-                                <td style="border: 1px solid black; text-align: left">
-                                    @php
-                                        $value = $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first()->value : 0;
-                                        if($value >= 18 && $value <= 20) {
-                                            echo 'Excellent';
-                                        } else if($value >= 15 && $value < 18) {
-                                            echo 'Trés bien';
-                                        } else if($value >= 14 && $value < 15) {
-                                            echo 'Bien';
-                                        } else if($value >= 12 && $value < 14) {
-                                            echo 'Assez bien';
-                                        } else if($value >= 10 && $value < 12) {
-                                            echo 'Passable'; 
-                                        } else {
-                                            echo 'Insuffisant';
-                                        }     
-                                    @endphp
-                                </td>
                             </tr>
                         @endforeach
-                        <tr>
-                            <td colspan="6" style="background-color: rgb(163 163 163); border: 1px solid black; padding-top: 10px; padding-bottom: 10px">
-                                <div style="display: flex; justify-content: space-between">
-                                    <span style="text-transform: uppercase">{{ $teaching['name'] }}</span>
-                                    <span>Coefficient: {{ $total_coefficient }}</span>
-                                    <span>Total: {{ $total_teaching }}</span>
-                                    <span>Moyenne: {{ round($total_teaching / $total_coefficient, 2) }}</span>
-                                    <span>
-                                        @php
-                                            // Teaching Unit student range
-                                            $ut_range = 1;
-                                            foreach($array_notes as $value) {
-                                                if(($total_teaching / $total_coefficient) > $value) {
-                                                    $ut_range++;
-                                                }
-                                            }
-                                        @endphp
-                                        Rang: {{ $ut_range }}
-                                    </span>
-                                </div>
-                            </td>
-                        </tr>
-                        @php
-                            $semester_total_coefficient += $total_coefficient;
-                            $semester_total_pound += $total_teaching;
-                            $semester_range += $ut_range ;
-                        @endphp
                     @endif
                 @endforeach
     
             </tbody>
 
         </table>
-        <div style="margin-top: 1px; display: flex; justify-content: space-between; background-color: rgb(163 163 163); border: 1px solid black; padding-top: 10px; padding-bottom: 10px">
+       {{--  <div style="margin-top: 1px; display: flex; justify-content: space-between; background-color: rgb(163 163 163); border: 1px solid black; padding-top: 10px; padding-bottom: 10px">
             <span style="text-transform: uppercase">resultats sequentiels</span>
             <span>Coefficient: {{ $semester_total_coefficient }}</span>
             <span>Total: {{ $semester_total_pound }}</span>
             <span>Moyenne: {{ round($semester_total_pound / $semester_total_coefficient, 2) }}</span>
             <span>Rang: {{ $range }}</span>
-        </div>
+        </div> --}}
     </div>
 
-    <div style="display: flex; column-gap: 10px; margin-top: 120px">
+   {{--  <div style="display: flex; column-gap: 10px; margin-top: 120px">
         <div style="width: 50%">
             <table style="border-collapse: collapse;border: 1px solid black; width: 100%">
                 <tbody>
@@ -312,6 +230,6 @@
                 <div style="border-top: 1px solid black; height: 100px"></div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
 </div>
