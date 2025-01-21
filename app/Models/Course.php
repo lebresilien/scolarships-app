@@ -14,7 +14,8 @@ class Course extends Model
         'name',
         'description',
         'teaching_unit_id',
-        'coefficient'
+        'coefficient',
+        'teacher_id'
     ];
 
    /*  public function groups() {
