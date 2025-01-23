@@ -29,10 +29,10 @@ class AcademicResource extends Resource
                     ->columnSpanFull()
                     ->unique(ignorable: fn ($record) => $record),
                 Forms\Components\Toggle::make('status')
-                ->label('année en cours')
-                ->hiddenOn('create'),
+                    ->label('année en cours')
+                    ->hiddenOn('create'),
                 Forms\Components\RichEditor::make('description')
-                ->columnSpanFull(),
+                    ->columnSpanFull(),
             ]);
     }
 

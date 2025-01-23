@@ -17,6 +17,7 @@ class School extends Model
         'phone_number',
         'registration_number',
         'is_primary_school',
+        'logo',
         'description'
     ];
 
