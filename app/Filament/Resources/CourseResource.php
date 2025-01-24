@@ -49,7 +49,11 @@ class CourseResource extends Resource
                 Forms\Components\Select::make('teaching_unit_id')
                     ->relationship('TeachingUnit', 'name')
                     ->required(),
+                Forms\Components\Select::make('teaching_unit_id')
+                    ->relationship('TeachingUnit', 'name')
+                    ->required(),
                 Forms\Components\Textarea::make('description')
+                ->columnSpanFull()
             ]);
     }
 
