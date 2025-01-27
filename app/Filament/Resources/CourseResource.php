@@ -13,6 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Closure;
+use App\Models\School;
 
 class CourseResource extends Resource
 {
@@ -29,13 +30,16 @@ class CourseResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Libéllé')
                     ->autofocus()
                     ->required()
                     ->rule(static function(Forms\Get $get, Forms\Components\Component $component): Closure {
                         return static function (string $attribute, $value, Closure $fail) use ($get, $component) {
                             $existing = Course::where([
                                 ['name', $value], 
-                                ['teaching_unit_id', $get('teaching_unit_id')]
+                                ['teaching_unit_id', $get('teaching_unit_id')],
+                                ['classroom_id', $get('classroom_id')],
+                                ['teacher_id', $get('teacher_id')]
                             ])->first();
 
                             if ($existing && $existing->getKey() !== $component->getRecord()?->getKey()) {
@@ -45,15 +49,24 @@ class CourseResource extends Resource
                         };
                     }),
                 Forms\Components\TextInput::make('coefficient')
+                    ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
                 Forms\Components\Select::make('teaching_unit_id')
-                    ->relationship('TeachingUnit', 'name')
+                    ->label('Unité d\'enseignement')
+                    ->relationship('teachingUnit', 'name')
                     ->required(),
-                Forms\Components\Select::make('teaching_unit_id')
-                    ->relationship('TeachingUnit', 'name')
+                Forms\Components\Select::make('teacher_id')
+                    ->label('Enseignant')
+                    ->relationship('teacher', 'name')
+                    ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
+                    ->required(),
+                Forms\Components\Select::make('classroom_id')
+                    ->label('Salle de classe')
+                    ->relationship('classroom', 'name')
+                    ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                ->columnSpanFull()
+                //->columnSpanFull()
             ]);
     }
 
@@ -63,7 +76,22 @@ class CourseResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable(),
                 Tables\Columns\TextColumn::make('coefficient'),
-                Tables\Columns\TextColumn::make('teachingUnit.name')->searchable(),
+                Tables\Columns\TextColumn::make('teachingUnit.name')
+                    ->label('Unité d\'enseignement')
+                    ->visible(!School::all()->first()->is_primary_school)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('teacher.name')
+                    ->label('Enseignant')
+                    ->visible(!School::all()->first()->is_primary_school)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('classroom.name')
+                    ->label('Classe')
+                    ->visible(!School::all()->first()->is_primary_school)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('teachingUnit.group.name')
+                    ->label('Groupe')
+                    //->visible(!School::all()->first()->is_primary_school)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([

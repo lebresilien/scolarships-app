@@ -14,4 +14,13 @@ class CreateCourse extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if(\App\Models\School::all()->first()->is_primary_school) {
+            $data['coefficient'] = 1;
+        }
+    
+        return $data;
+    }
 }

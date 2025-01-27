@@ -20,6 +20,10 @@ class Course extends Model
         'classroom_id'
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d',
+    ];
+
    /*  public function groups() {
         return $this->belongsToMany(Group::class, 'group_course');
     } */
@@ -37,7 +41,7 @@ class Course extends Model
         return $this->belongsTo(Classroom::class);
     }
 
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d',
-    ];
+    public function teacher(): BelongsTo {
+        return $this->belongsTo(Teacher::class);
+    }
 }
