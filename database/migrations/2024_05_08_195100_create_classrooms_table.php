@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('building_id')->contrained();
             $table->foreignId('group_id')->contrained();
             $table->foreignId('user_id')->contrained();
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

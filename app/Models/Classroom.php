@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Classroom extends Model
 {
@@ -29,6 +30,11 @@ class Classroom extends Model
     public function group() {
         return $this->belongsTo(Group::class);
     } 
+
+    public function courses(): HasMany
+    {
+        return $this->hasMany(Course::class);
+    }
 
     public function students() {
         return $this->belongsToMany(Student::class)->withPivot('academic_id', 'status', 'id');

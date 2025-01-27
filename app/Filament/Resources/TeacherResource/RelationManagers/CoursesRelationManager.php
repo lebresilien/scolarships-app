@@ -1,38 +1,28 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\TeacherResource\RelationManagers;
 
-use App\Filament\Resources\CourseResource\Pages;
-use App\Filament\Resources\CourseResource\RelationManagers;
-use App\Models\Course;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Closure;
-use App\Models\School;
+use App\Models\{ Course, School };
 
-class CourseResource extends Resource
+class CoursesRelationManager extends RelationManager
 {
-    protected static ?string $model = Course::class;
+    protected static string $relationship = 'courses';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    public static ?string $label = 'Cours';
-
-    protected static ?string $navigationGroup = 'Enseignements';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Libéllé')
-                    ->autofocus()
                     ->required()
+                    ->maxLength(255)
                     ->rule(static function(Forms\Get $get, Forms\Components\Component $component): Closure {
                         return static function (string $attribute, $value, Closure $fail) use ($get, $component) {
                             $existing = Course::where([
@@ -44,10 +34,10 @@ class CourseResource extends Resource
 
                             if ($existing && $existing->getKey() !== $component->getRecord()?->getKey()) {
                                 $group = ucwords($get('teaching_unit_id'));
-                                $fail("The {$value} Course \"${group}\" already exists.");
+                                $fail("The {$value} Teaching Unit \"${group}\" already exists.");
                             }
-                        };
-                    }),
+                    };
+                }),
                 Forms\Components\TextInput::make('coefficient')
                     ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
@@ -55,33 +45,26 @@ class CourseResource extends Resource
                     ->label('Unité d\'enseignement')
                     ->relationship('teachingUnit', 'name')
                     ->required(),
-                Forms\Components\Select::make('teacher_id')
-                    ->label('Enseignant')
-                    ->relationship('teacher', 'name')
-                    ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
-                    ->required(),
                 Forms\Components\Select::make('classroom_id')
                     ->label('Salle de classe')
                     ->relationship('classroom', 'name')
                     ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
                 Forms\Components\Textarea::make('description')
-                //->columnSpanFull()
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                ->label('Libelle')
+                ->searchable(),
                 Tables\Columns\TextColumn::make('coefficient'),
                 Tables\Columns\TextColumn::make('teachingUnit.name')
                     ->label('Unité d\'enseignement')
-                    ->visible(!School::all()->first()->is_primary_school)
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('teacher.name')
-                    ->label('Enseignant')
                     ->visible(!School::all()->first()->is_primary_school)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('classroom.name')
@@ -95,46 +78,19 @@ class CourseResource extends Resource
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListCourses::route('/'),
-            'create' => Pages\CreateCourse::route('/create'),
-            'edit' => Pages\EditCourse::route('/{record}/edit'),
-        ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
-    }
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
     }
 }
