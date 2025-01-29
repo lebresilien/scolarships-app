@@ -80,10 +80,20 @@ class ViewNote extends Component
     public function save() {
 
         $error = false;
+        $message = "";
 
         foreach($this->form as $item) {
             if($item['value'] > 20) {
                 $error = true;
+                $message = "La note ne peut pas être supérieure à 20";
+            }
+            if(!$item['value']) {
+                $error = true;
+                $message = "Une note n'a pas été renseignée";
+            }
+            if($item['value'] < 0) {
+                $error = true;
+                $message = "Une note inferieure à 0 été renseignée";
             }
         }
 
@@ -91,7 +101,7 @@ class ViewNote extends Component
             Notification::make()
                 ->danger()
                 ->title('Erreur')
-                ->body('Une note superieure à 20 a été detectée.')
+                ->body($message)
                 ->send();
         } else 
         {
