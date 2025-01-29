@@ -13,7 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Closure;
-use App\Models\School;
+use App\Models\{ Teacher, School, Classroom };
 
 class CourseResource extends Resource
 {
@@ -95,7 +95,33 @@ class CourseResource extends Resource
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('teacher_id')
+                    ->form([
+                        Forms\Components\Select::make('value')
+                            ->label('Enseignant')
+                            ->options(Teacher::all()->pluck('name', 'id'))
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                fn (Builder $query, $value): Builder => $query->where('teacher_id', $value),
+                            );
+                }),
+                Tables\Filters\Filter::make('classroom_id')
+                    ->form([
+                        Forms\Components\Select::make('value')
+                            ->label('Salle de classe')
+                            ->options(Classroom::all()->pluck('name', 'id'))
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                fn (Builder $query, $value): Builder => $query->where('classroom_id', $value),
+                            );
+                })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
