@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Models\{ Student, User, Classroom }; 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +14,29 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        /* User::factory(2)->state(new Sequence(
+            ['remember_token' => 'YZZZEERTYUII102'],
+            ['remember_token' => 'NDKKDJDJDOD8LD'],
+        ))->create(); */
 
-        User::factory()->create([
+        $classroom = Classroom::find(7);
+
+        Student::factory(10)->state(new Sequence(
+            ['sexe' => 1],
+            ['sexe' => 0],
+        ))
+        ->hasAttached(
+            [$classroom],
+            [
+                'academic_id' => 1,
+                'status' => true,
+                'state' => true
+            ]
+        )->create();
+
+       /*  User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
-        ]);
+        ]); */
     }
 }
