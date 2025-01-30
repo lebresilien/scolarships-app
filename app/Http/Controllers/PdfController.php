@@ -14,6 +14,20 @@ class PdfController extends Controller
     /**
      * Handle the incoming request.
      */
+
+    public function loadReport(Student $student, string $seq) {
+
+        $pdf = Pdf::loadView('pdf.report', [
+            'seq' => $seq,
+            'student' => $student
+        ]);
+
+        $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
+
+        return $pdf->stream();
+
+    }
+
     public function sequence(Student $student, string $seq)
     {
         $classroom = Classroom::find($student->current_classroom->id);
