@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{ Sequence, Student, ClassroomStudent, Classroom, Trimester, Note };
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use App\Filament\Traits\ActiveYear;
 
@@ -17,14 +16,14 @@ class PdfController extends Controller
 
     public function loadReport(Student $student, string $seq) {
 
-        $pdf = Pdf::loadView('pdf.report', [
+       /*  $pdf = Pdf::loadView('pdf.report', [
             'seq' => $seq,
             'student' => $student
         ]);
 
         $pdf->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);
 
-        return $pdf->stream();
+        return $pdf->stream(); */
 
     }
 

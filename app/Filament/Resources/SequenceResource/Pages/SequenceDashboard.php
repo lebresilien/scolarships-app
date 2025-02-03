@@ -42,10 +42,15 @@ class SequenceDashboard extends Page implements Tables\Contracts\HasTable
                 ->label('PDF')
                 ->color('primary')
                 ->icon('heroicon-s-cloud-arrow-down')
-                ->url(fn ($record) => route('reports', ['student' => $record, 'seq' => $this->record]))
+                ->url(fn ($record) => route('reports', ['student' => $record, 'seq' => $this->record])),
+            
         ];
     }
 
+    public function renderView($record)
+    {
+        return view('pdf.report', ['record' => $record]); 
+    }
 
     protected function getTableColumns(): array
     {
