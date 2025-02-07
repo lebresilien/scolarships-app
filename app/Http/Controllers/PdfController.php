@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{ Sequence, Student, ClassroomStudent, Classroom, Trimester, Note };
+use App\Models\{ Sequence, Student, ClassroomStudent, Classroom, Trimester, Note, School };
 use Illuminate\Support\Facades\DB;
 use App\Filament\Traits\ActiveYear;
 
@@ -58,19 +58,20 @@ class PdfController extends Controller
     public function trimester(Student $student, Trimester $trimester)
     {
         $classroom = Classroom::find($student->current_classroom->id);
-        $id_array = [];
-        foreach($trimester->sequence as $item) {
-            array_push($id_array, $item['sequence']);
-        }
+        $sequences_id = [];
 
+        foreach($trimester->sequence as $item) {
+            array_push($sequences_id, $item['sequence']);
+        }
+        
         $averageGrades = DB::table('notes')
                             ->select('classroom_student_id', DB::raw('(SUM(value * courses.coefficient) / SUM(courses.coefficient)) as average'))
-                            ->whereIn('sequence_id', [1, 3])
+                            ->whereIn('sequence_id', $sequences_id)
                             ->whereIn('classroom_student_id', $classroom->students->where('pivot.academic_id', $this->active()->id)->pluck('pivot.id'))
                             ->join('courses', 'courses.id', '=', 'notes.course_id')
                             ->groupBy('classroom_student_id')
                             ->get();
-
+        
         $range = 1;
         
         foreach($averageGrades as $item) {
@@ -84,7 +85,8 @@ class PdfController extends Controller
             'seq' => $trimester,
             'policy' => ClassroomStudent::find($student->policy),
             'statistics' => $averageGrades,
-            'range' => $range   
+            'range' => $range,
+            'school' => School::all()->first()  
         ]);
     }
 

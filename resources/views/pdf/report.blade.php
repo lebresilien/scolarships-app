@@ -71,7 +71,9 @@
                     
                 </div>
 
-                <div id="logo"></div>
+                <div id="logo">
+                    <image src="{{ asset('storage/' . $school->logo) }}" alt="{{ $school->name }}"/> 
+                </div>
 
                 <div id="en">
 
