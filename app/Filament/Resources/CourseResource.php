@@ -13,7 +13,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Closure;
-use App\Models\{ Teacher, School, Classroom };
+use App\Models\{ Teacher, School, Classroom, TeachingUnit };
 
 class CourseResource extends Resource
 {
@@ -51,18 +51,27 @@ class CourseResource extends Resource
                 Forms\Components\TextInput::make('coefficient')
                     ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
+                Forms\Components\Select::make('classroom_id')
+                    ->label('Salle de classe')
+                    ->relationship('classroom', 'name')
+                    ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
+                    ->required()
+                    ->live(),
                 Forms\Components\Select::make('teaching_unit_id')
                     ->label('Unité d\'enseignement')
-                    ->relationship('teachingUnit', 'name')
+                    ->options(function (Forms\Get $get): array {
+                        $classroom = Classroom::find($get('classroom_id'));
+                        //dd($classroom);
+                        if($classroom) 
+                        return TeachingUnit::where('group_id', $classroom->group->id)->get()->pluck('name', 'id')->all();
+                    else return [];
+                    })
+                    //->live()
+                    //->afterStateUpdated(fn ($set) => $set('classroom_id', null))
                     ->required(),
                 Forms\Components\Select::make('teacher_id')
                     ->label('Enseignant')
                     ->relationship('teacher', 'name')
-                    ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
-                    ->required(),
-                Forms\Components\Select::make('classroom_id')
-                    ->label('Salle de classe')
-                    ->relationship('classroom', 'name')
                     ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
                 Forms\Components\Textarea::make('description')

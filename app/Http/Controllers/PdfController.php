@@ -59,7 +59,7 @@ class PdfController extends Controller
     {
         $classroom = Classroom::find($student->current_classroom->id);
         $sequences_id = [];
-
+        
         foreach($trimester->sequence as $item) {
             array_push($sequences_id, $item['sequence']);
         }
@@ -86,7 +86,8 @@ class PdfController extends Controller
             'policy' => ClassroomStudent::find($student->policy),
             'statistics' => $averageGrades,
             'range' => $range,
-            'school' => School::all()->first()  
+            'school' => School::all()->first(),
+            'sequences_id' => $sequences_id
         ]);
     }
 

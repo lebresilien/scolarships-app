@@ -54,14 +54,51 @@
         }
         img {
             height: 100px;
-            width: 100px
+            width: 100px;
+            border-radius: 50%;
         }
         .delegation {
             text-transform: uppercase;
             font-size: 13px
         }
-        .m-t {
+        .mt {
             margin-top: 3px
+        }
+        #block_1 {
+            display: flex;
+            justify-content: center;
+            column-gap: 25px;
+        }
+        #report_name {
+            background-color: rgb(163 163 163);
+            border: 1px solid black;
+            padding: 0 25px;
+            text-transform: uppercase;
+        }
+        #block_2 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid black
+        }
+        .flex {
+            display: flex
+        }
+        .block_3 {
+            display: flex; 
+            justify-content: 
+            space-between; 
+            width: 220px
+        }
+        table {
+            border-collapse: collapse; 
+            width: 100%
+        }
+        th, td {
+            border: 1px solid black
+        }
+        #table_header {
+            background-color: rgb(163 163 163);
         }
     </style>
     <body>
@@ -80,15 +117,15 @@
 
                     <span class="country_star block">********</span>
 
-                    <span class="delegation block">ministeres des enseignements secondaires</span>
+                    <span class="delegation block"> {{ !$school->is_primary_school ? 'ministeres des enseignements secondaires' : 'ministeres de l\'education de base' }} </span>
 
                     <span class="delegation block">delegation regionnale du centre</span>
 
                     <span class="delegation block">delegation departementale du nyong et kelle</span>
 
-                    <span class="delegation block m-t" >{{ $school->name }}</span>
+                    <span class="delegation block mt" >{{ $school->name }}</span>
 
-                    <span class="delegation block">bp: {{ $school->postal_address }} - {{ $school->phone_number }}</span>
+                    <span class="block">BP: {{ $school->postal_address }} - Tel: {{ $school->phone_number }}</span>
 
                     <span class="delegation block">immatriculation: {{ $school->postal_address }}</span>
                 
@@ -106,7 +143,7 @@
 
                     <span class="country_star block">********</span>
 
-                    <span class="delegation block">ministry of secondary education</span>
+                    <span class="delegation block">{{ !$school->is_primary_school ? 'ministry of secondary education' : 'ministry of basic education'  }}</span>
 
                     <span class="delegation block">regional delegation of centre</span>
 
@@ -114,11 +151,165 @@
 
                     <span class="delegation block m-t">{{ $school->name }}</span>
 
-                    <span class="delegation block">bp: {{ $school->postal_address }} - {{ $school->phone_number }}</span>
+                    <span class="block">BP: {{ $school->postal_address }} - Tel: {{ $school->phone_number }}</span>
 
                     <span class="delegation block">immatriculation: {{ $school->postal_address }}</span>
 
                 </div>
+
+            </div>
+
+            <div id="block_1" class="mt">
+
+                <div id="report_name">
+                    <p>bulletin de note du {{ $seq->name }}</p>
+                </div>
+
+                <p>Année scolaire: {{ $seq->academic->name }}</p>
+                
+            </div>
+
+            <div id="block_2">
+
+                <div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Matricule&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span>{{ $record['matricule'] }}</span>
+                    </div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Nom(s) et Prénom(s)&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span style="text-transform: uppercase">{{ $record['fname'] . ' ' . $record['lname'] }}</span>
+                    </div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Date et lieu de naissance&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span>{{ $record['sexe'] == 0 ? 'Née'  : 'Né' }} le {{ $record['born_at'] . ' à ' . $record['born_place'] }}</span>
+                    </div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Classe&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span>{{ $record['current_classroom']['name'] }}</span>
+                    </div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Effectif&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span>{{ $record['current_classroom']['count_student'] }}</span>
+                    </div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Redoublant(e)&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span>{{ $policy->state ? 'Oui' : 'Non' }}</span>
+                    </div>
+
+                    <div class="flex">
+                        <div class="block_3">
+                            <span>Adresse&ensp;</span>
+                            <span>:&ensp;</span>
+                        </div>
+                        <span>{{ $record['quarter'] }}</span>
+                    </div>
+
+                </div>
+
+                <div>
+                    @if ($record->logo)
+                        <img src="{{ asset('storage/' . $record->logo) }}" alt="logo" /> 
+                    @endif 
+                </div>
+
+            </div>
+
+            <div>
+                
+                @if(!$school->is_primary_school)
+
+                    <table>
+                        
+                        <thead>
+                            <tr id="table_header">
+                                <th>Matières</th>
+                                <th>Eva 1 sur 20</th>
+                                <th>Eva 2 sur 20</th>
+                                <th>Coeff</th>
+                                <th>Total</th>
+                                <th>Moy sur 20</th>
+                                <th>RG</th>
+                                <th>Prem Dem</th>
+                                <th>Enseignant</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @php
+                                $semester_total_coefficient = 0;
+                                $semester_total_pound = 0;
+                                $semester_range = 0;
+                               dd($record['current_classroom']['teachings'] );
+                            @endphp
+
+                            @foreach($record['current_classroom']['teachingUnit'] as $teaching)
+
+                                @if(count($teaching['courses']) > 0)
+
+                                    @php
+                                        //$policies = $seq->notes->where('classroom_student_id', '<>', $record->policy)->whereIn('course_id', $teaching['courses']->pluck('id'))->pluck('classroom_student_id');
+                                    @endphp
+
+                                    @foreach($teaching['courses'] as $course)
+
+                                        <tr>
+                                            <td style="text-transform: uppercase">
+                                                {{ $course['name'] }}- {{ $course->teachingUnit->name }}
+                                            </td>
+                                            <td>
+                                                {{ $policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value : 0 }}
+                                            </td>
+                                            <td>
+                                                {{ $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value : 0 }}
+                                            </td>
+                                            <td>
+                                                {{ $course['coefficient']  }}
+                                            </td>
+                                            <td style="border: 1px solid black; text-align: right">
+                                                {{ $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $seq->id)->where('course_id', $course['id'])->first()->value * $course['coefficient']  : 0 }}
+                                            </td>
+                                        </tr>
+
+                                    @endforeach
+
+                                @endif
+
+                            @endforeach
+
+                            <tr>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                @endif
 
             </div>
 

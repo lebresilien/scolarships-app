@@ -16,7 +16,7 @@ class Classroom extends Model
         'group_id',
         'user_id',
         'name',
-        'description',
+        'description'
     ];
 
     protected $casts = [
