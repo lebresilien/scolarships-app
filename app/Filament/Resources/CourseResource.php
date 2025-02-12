@@ -39,7 +39,7 @@ class CourseResource extends Resource
                                 ['name', $value], 
                                 ['teaching_unit_id', $get('teaching_unit_id')],
                                 ['classroom_id', $get('classroom_id')],
-                                ['teacher_id', $get('teacher_id')]
+                                //['teacher_id', $get('teacher_id')]
                             ])->first();
 
                             if ($existing && $existing->getKey() !== $component->getRecord()?->getKey()) {

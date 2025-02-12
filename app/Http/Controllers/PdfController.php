@@ -79,7 +79,7 @@ class PdfController extends Controller
                 $range++;
             }
         }
-
+       // return $trimester->notes($sequences_id)->get();
         return view('pdf.trimester', [
             'record' => $student,
             'seq' => $trimester,

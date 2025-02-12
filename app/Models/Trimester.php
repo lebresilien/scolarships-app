@@ -32,4 +32,8 @@ class Trimester extends Model
     public function academic(): BelongsTo {
         return $this->belongsTo(Academic::class);
     }
+
+    public function notes($seqs) {
+        return Note::whereIn('sequence_id', $seqs);
+    }
 }
