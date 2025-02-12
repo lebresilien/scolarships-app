@@ -270,6 +270,7 @@
                         <tbody>
 
                             @php
+
                                 $semester_total_coefficient = 0;
                                 $semester_total_pound = 0;
                                 $semester_range = 0;
@@ -278,10 +279,11 @@
 
                             @foreach($record['current_classroom']['group']['teachings'] as $teaching)
 
-
                                 @if(count($teaching['courses']) > 0)
 
                                     @php
+
+                                        $semester_total_coefficient += $teaching->courses->sum('coefficient');
                                         $ue_range = 1;
                                         $total_ue_notes = 0;
 
@@ -314,13 +316,13 @@
                                                 {{ $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first() ? $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value : 0 }}
                                             </td>
                                             <td class="text-align">
-                                                {{ $course['coefficient']  }}
+                                                {{ $course->coefficient  }}
                                             </td>
                                             <td class="text-align">
                                                 @php
-                                                    $total_ue_notes += $policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value;
+                                                    $total_ue_notes += (($policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value) / 2 ) * $course->coefficient;
                                                 @endphp
-                                                {{ $policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value }}
+                                                {{ (($policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value) / 2 ) * $course->coefficient }}
                                             </td>
                                             <td class="text-align">
                                                 {{ number_format(($policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value) / 2, 2) }}
@@ -364,14 +366,8 @@
                                     @endforeach
 
                                     <tr>
-                                        <td colspan="2" class="no-border" style="padding-top: 10px; padding-bottom: 10px">
+                                        <td colspan="2" class="no-border" style="text-transform: capitalize; border-left: 1px solid black; padding-top: 7px; padding-bottom: 7px">
                                             {{ $teaching['name'] }}
-                                           {{--  <div style="display: flex; justify-content: space-between">
-
-                                                <span style="text-transform: uppercase">{{ $teaching['name'] }}</span>
-
-                                            </div> --}}
-
                                         </td>
                                         <td class="text-align no-border">Total:</td>
                                         <td class="text-align no-border">
@@ -382,7 +378,7 @@
                                         </td>
                                         <td colspan="3" class="no-border"></td>
                                         <td class="no-border" style="text-align: right">Moyenne:</td>
-                                        <td class="no-border">
+                                        <td class="no-border" style="border-right: 1px solid black">
                                             <div style="display: flex; justify-content: space-around">
                                                 <span>
                                                     {{ number_format(($total_ue_notes / $teaching->courses->sum('coefficient')), 2)}}
@@ -395,11 +391,26 @@
 
                                 @endif
 
+                                @php
+                                    $semester_total_pound += $total_ue_notes; 
+                                @endphp
+
                             @endforeach
 
                             <tr>
+                                <td colspan="10" style="padding-top: 7px; padding-bottom: 7px; border-top: 2px solid black; background-color: rgb(163 163 163)">
 
+                                    <div style="display: flex; justify-content: space-between">
+                                        <span>RESULTATS TRIMESTRIELS</span>
+                                        <span>Total: &nbsp;&nbsp;&nbsp; {{ $semester_total_pound }}</span>
+                                        <span>Coeff: &nbsp;&nbsp;&nbsp; {{ $semester_total_coefficient }}</span>
+                                        <span>Moyenne: &nbsp;&nbsp; {{ number_format($semester_total_pound/$semester_total_coefficient, 2) }}</span>
+                                        <span>Rang: &nbsp;&nbsp;&nbsp; {{ $range }}</span>
+                                    </div>
+
+                                </td>
                             </tr>
+
                         </tbody>
 
                     </table>
