@@ -60,11 +60,12 @@ class CourseResource extends Resource
                 Forms\Components\Select::make('teaching_unit_id')
                     ->label('Unité d\'enseignement')
                     ->options(function (Forms\Get $get): array {
+                        
                         $classroom = Classroom::find($get('classroom_id'));
-                        //dd($classroom);
+                        
                         if($classroom) 
-                        return TeachingUnit::where('group_id', $classroom->group->id)->get()->pluck('name', 'id')->all();
-                    else return [];
+                            return TeachingUnit::where('group_id', $classroom->group->id)->get()->pluck('name', 'id')->all();
+                        else return [];
                     })
                     //->live()
                     //->afterStateUpdated(fn ($set) => $set('classroom_id', null))
