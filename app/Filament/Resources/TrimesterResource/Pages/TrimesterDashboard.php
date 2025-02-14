@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TrimesterResource\Pages;
 use App\Filament\Resources\TrimesterResource;
 use Filament\Resources\Pages\Page;
 use Filament\Tables;
+use Filament\Forms;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
 use App\Filament\Traits\ActiveYear;
 use App\Models\{ Classroom, Student, Academic, ClassroomStudent };
@@ -36,7 +37,7 @@ class TrimesterDashboard extends Page implements Tables\Contracts\HasTable
     {
         return [
             Tables\Actions\Action::make('pdf') 
-                ->label('PDF')
+                ->label('Bulletin')
                 ->color('primary')
                 ->icon('heroicon-s-cloud-arrow-down')
                 ->url(fn ($record) => route('trimester-report', ['student' => $record, 'trimester' => $this->record]))
@@ -62,14 +63,14 @@ class TrimesterDashboard extends Page implements Tables\Contracts\HasTable
         ];
     }
 
-    public function getFilters(): array
+    public function getTableFilters(): array
     {
         return [
                 Tables\Filters\Filter::make('classroom_id')
                     ->form([
                         Forms\Components\Select::make('value')
-                        ->label('Classe')
-                        ->options(Classroom::all()->pluck('name', 'id'))
+                            ->label('Classe')
+                            ->options(Classroom::all()->pluck('name', 'id'))
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query

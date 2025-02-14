@@ -73,14 +73,14 @@ class SequenceDashboard extends Page implements Tables\Contracts\HasTable
         ];
     }
 
-    public function getFilters(): array
+    public function getTableFilters(): array
     {
         return [
                 Tables\Filters\Filter::make('classroom_id')
                     ->form([
                         Forms\Components\Select::make('value')
-                        ->label('Classe')
-                        ->options(Classroom::all()->pluck('name', 'id'))
+                            ->label('Classe')
+                            ->options(Classroom::all()->pluck('name', 'id'))
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
