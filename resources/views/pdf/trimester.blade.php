@@ -485,7 +485,7 @@
                     </table>
                 </div>
 
-                <div style="width: 50%; border: 1px solid black">
+                <div style="width: 50%;">
                    
                    @php
                         $average_tri = number_format($semester_total_pound/$semester_total_coefficient, 2);

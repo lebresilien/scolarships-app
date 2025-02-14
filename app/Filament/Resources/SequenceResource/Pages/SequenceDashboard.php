@@ -69,7 +69,6 @@ class SequenceDashboard extends Page implements Tables\Contracts\HasTable
                 }),
             Tables\Columns\TextColumn::make('current_classroom.name')
                 ->label('Classe')
-                //->searchable()
         ];
     }
 
