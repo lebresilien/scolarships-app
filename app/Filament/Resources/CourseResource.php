@@ -60,12 +60,15 @@ class CourseResource extends Resource
                 Forms\Components\Select::make('teaching_unit_id')
                     ->label('Unité d\'enseignement')
                     ->options(function (Forms\Get $get): array {
-
-                        $classroom = Classroom::find($get('classroom_id'));
-                        
-                        if($classroom) 
-                            return TeachingUnit::where('group_id', $classroom->group->id)->get()->pluck('name', 'id')->all();
-                        else return [];
+                        if(!School::all()->first()->is_primary_school) {
+                            $classroom = Classroom::find($get('classroom_id'));
+                            
+                            if($classroom) 
+                                return TeachingUnit::where('group_id', $classroom->group->id)->get()->pluck('name', 'id')->all();
+                            else return [];
+                        } else {
+                            return TeachingUnit::whereNull('deleted_at')->get()->pluck('group_name', 'id')->toArray();
+                        }
                     })
                     ->required(),
                 Forms\Components\Select::make('teacher_id')

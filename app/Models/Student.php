@@ -90,7 +90,7 @@ class Student extends Model
         $amount = 0;
 
         $policy_id = $this->classrooms()->where('academic_id', $this->academic()->id)->first()->pivot->id;
-        $policy = \App\Models\ClassroomStudent::find($policy_id);
+        $policy = ClassroomStudent::find($policy_id);
         
         foreach($policy->transactions as $trx) {
             $amount += $trx->amount;

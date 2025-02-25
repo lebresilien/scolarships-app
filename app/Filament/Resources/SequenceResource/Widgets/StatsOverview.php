@@ -26,7 +26,7 @@ class StatsOverview extends BaseWidget
         $participates = Note::where('sequence_id', json_decode($this->record)->id)
                     ->distinct('classroom_student_id')
                     ->count();
-        
+        //dd($participates);
         $averageGrades = DB::table('notes')
                 ->select('classroom_student_id', DB::raw('(SUM(value * courses.coefficient) / SUM(courses.coefficient)) as average'))
                 ->where('sequence_id', json_decode($this->record)->id)

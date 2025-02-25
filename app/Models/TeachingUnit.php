@@ -37,4 +37,8 @@ class TeachingUnit extends Model
         }
         return $coeff;
     }
+
+    public function getGroupNameAttribute(): string {
+        return $this->name . ' (' . strtoupper($this->group->name) . ')';
+    }
 }

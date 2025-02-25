@@ -5,7 +5,7 @@
       </h3>
    </div>
    <div class="flex flex-wrap gap-3">
-      @foreach($record->courses as $coursee)
+      @foreach($record->group->courses as $coursee)
          <x-filament::section>
             <x-slot name="heading">
                {{ ucfirst($coursee->name) }}

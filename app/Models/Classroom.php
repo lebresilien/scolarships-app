@@ -29,11 +29,18 @@ class Classroom extends Model
 
     public function group() {
         return $this->belongsTo(Group::class);
-    } 
+    }
 
     public function courses(): HasMany
     {
         return $this->hasMany(Course::class);
+    }
+
+    public function teachings() {
+        $ue = collect([]);
+        foreach($this->courses() as $courses) {
+            array_push($ue, $courses->teachingUnit->id);
+        }
     }
 
     public function students() {

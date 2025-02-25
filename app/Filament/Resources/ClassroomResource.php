@@ -5,7 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ClassroomResource\Pages;
 use App\Filament\Pages\NotePage;
 use App\Filament\Resources\ClassroomResource\RelationManagers;
-use App\Models\{ Academic, Classroom, Sequence };
+use App\Models\{ Academic, Classroom, Sequence, Group };
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -62,7 +62,20 @@ class ClassroomResource extends Resource
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('group_id')
+                    ->form([
+                        Forms\Components\Select::make('value')
+                            ->label('Groupe')
+                            ->options(Group::all()->pluck('name', 'id'))
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                fn (Builder $query, $value): Builder => $query->where('group_id', $value),
+                            );
+                    })
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

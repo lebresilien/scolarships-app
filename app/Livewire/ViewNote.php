@@ -87,10 +87,11 @@ class ViewNote extends Component
                 $error = true;
                 $message = "La note ne peut pas être supérieure à 20";
             }
-            /* if(!$item['value']) {
-                $error = true;
-                $message = "Une note n'a pas été renseignée";
-            } */
+            if(!$item['value']) {
+                $item['value'] = 0;
+                //$error = true;
+                //$message = "Une note n'a p";
+            }
             if($item['value'] < 0) {
                 $error = true;
                 $message = "Une note inferieure à 0 été renseignée";

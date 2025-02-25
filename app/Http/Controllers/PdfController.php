@@ -17,6 +17,16 @@ class PdfController extends Controller
     public function sequence(Student $student, string $seq)
     {
         $classroom = Classroom::find($student->current_classroom->id);
+        
+        $error = false;
+        foreach($classroom->group->teachings as $ue) {
+            foreach($ue->courses as $course) {
+                $value = Note::where('course_id', $course->id)->where('sequence_id', $seq)->where('classroom_student_id', $student->policy)->first() ? Note::where('course_id', $course->id)->where('sequence_id', $seq)->where('classroom_student_id', $student->policy)->first()->value : null;
+                if($value === null) $error = true;
+            }
+        }
+
+        if ($error) return view('pdf.hello');
 
         $averageGrades = DB::table('notes')
                             ->select('classroom_student_id', DB::raw('(SUM(value * courses.coefficient) / SUM(courses.coefficient)) as average'))
@@ -32,7 +42,7 @@ class PdfController extends Controller
                 $range++;
             }
         }
-      
+     
         return view('pdf.sequence', [
             'record' => $student,
             'seq' => Sequence::find($seq),

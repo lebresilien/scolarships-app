@@ -417,6 +417,159 @@
                         </tbody>
 
                     </table>
+                @else
+
+                    <table>
+
+                        <thead>
+
+                            <tr id="table_header">
+                                <th>Matières</th>
+                                <th>Eva 1 sur 20</th>
+                                <th>Eva 2 sur 20</th>
+                                <th>Moy sur 20</th>
+                                <th>RG</th>
+                                <th>Prem Dem</th>
+                                <th>Observations</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @php
+
+                                $semester_total_coefficient = 0;
+                                $semester_total_pound = 0;
+                                $semester_range = 0;
+
+                            @endphp
+
+                            @foreach($record['current_classroom']['group']['teachings'] as $teaching)
+
+                                @if(count($teaching['courses']) > 0)
+
+                                    @php
+
+                                        $semester_total_coefficient += $teaching->courses->sum('coefficient');
+                                        $ue_range = 1;
+                                        $total_ue_notes = 0;
+
+                                        $averages = $seq->notes($sequences_id)
+                                                        ->selectRaw('classroom_student_id, (SUM(value) / '. $teaching->courses->sum('coefficient') . ') as average')
+                                                        ->whereIn('course_id', $teaching->courses->pluck('id'))
+                                                        ->groupBy('classroom_student_id')
+                                                        ->get();
+
+                                        $curent_student = $averages->where('classroom_student_id', $policy->id);
+                                        
+                                        foreach ($averages as $item) {
+                                            if($item->average > $curent_student->value('average')) {
+                                                $ue_range++;
+                                            }
+                                        }
+
+                                    @endphp
+
+                                    @foreach($teaching['courses'] as $course)
+
+                                        <tr>
+                                            <td style="text-transform: capitalize">
+                                                {{ $course['name'] }}
+                                            </td>
+                                            <td class="text-align">
+                                                {{ $policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value }}
+                                            </td>
+                                            <td class="text-align">
+                                                {{ $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value }}
+                                            </td>
+                                            <td class="text-align">
+                                                @php
+                                                    $total_ue_notes += (($policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value) / 2 );
+                                                @endphp
+                                                {{ (($policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value) / 2 )}}
+                                            </td>
+                                            <td class="text-align">
+                                                @php
+                                                    $position = 1;
+                                                    $val = ($policy->notes()->where('sequence_id', $sequences_id[0])->where('course_id', $course['id'])->first()->value + $policy->notes()->where('sequence_id', $sequences_id[1])->where('course_id', $course['id'])->first()->value) / 2;
+                                                    $course_notes = $course->notes()->selectRaw('classroom_student_id, (SUM(value) / 2) as value')->whereIn('sequence_id', $sequences_id)->where('classroom_student_id', '<>', $policy->id)->groupBy('classroom_student_id')->get();
+                                                    foreach ($course_notes as $item) {
+                                                        if($item->value > $val) {
+                                                            $position++;
+                                                        }
+                                                    }
+                                                    echo $position;
+                                                @endphp
+                                            </td>
+                                            <td class="text-align">
+                                                @php
+                                                    $notes = $course->notes()->selectRaw('classroom_student_id, (SUM(value) / 2) as value')->whereIn('sequence_id', $sequences_id)->groupBy('classroom_student_id')->get();
+                                                    echo 'P: ' . $notes->max('value') . '<br>';
+                                                    echo 'D: ' . $notes->min('value');
+                                                @endphp
+                                            </td>
+                                            <td class="text-align">
+                                                @if($val < 10 )
+                                                    Compétences non acquises
+                                                @elseif ($val >= 10 && $val < 12)
+                                                    Compétences moyennement acquises
+                                                @elseif ($val >= 12 && $val < 15)
+                                                    Compétences acquises
+                                                @else
+                                                    Compétences bien acquises
+                                                @endif
+                                            </td>
+                                        </tr>
+
+                                    @endforeach
+
+                                    <tr>
+                                        <td colspan="2" class="no-border" style="text-transform: capitalize; border-left: 1px solid black; padding-top: 7px; padding-bottom: 7px">
+                                            {{ $teaching['name'] }}
+                                        </td>
+                                        <td class="text-align no-border">Total: {{ $teaching->courses->sum('coefficient') }}</td>
+                                        <td class="no-border text-align">
+                                            {{ $total_ue_notes }}
+                                        </td>
+                                        <td colspan="1" class="no-border"></td>
+                                        <td class="no-border" style="text-align: right">Moyenne:</td>
+                                        <td class="no-border" style="border-right: 1px solid black">
+                                            <div style="display: flex; justify-content: space-around">
+                                                <span>
+                                                    {{ number_format(($total_ue_notes / $teaching->courses->sum('coefficient')), 2)}}
+                                                </span>
+                                                <span>Rang: </span>
+                                                <span>{{ $ue_range }}/{{ $record['current_classroom']['count_student'] }}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                @endif
+
+                                @php
+                                    $semester_total_pound += $total_ue_notes; 
+                                @endphp
+
+                            @endforeach
+
+                            <tr>
+                                <td colspan="7" style="padding-top: 7px; padding-bottom: 7px; border-top: 2px solid black; background-color: rgb(163 163 163)">
+
+                                    <div style="display: flex; justify-content: space-between">
+                                        <span>RESULTATS TRIMESTRIELS</span>
+                                        <span>Total: &nbsp;&nbsp;&nbsp; {{ $semester_total_pound }}</span>
+                                        <span>Coeff: &nbsp;&nbsp;&nbsp; {{ $semester_total_coefficient }}</span>
+                                        <span>Moyenne: &nbsp;&nbsp; {{ number_format($semester_total_pound/$semester_total_coefficient, 2) }}</span>
+                                        <span>Rang: &nbsp;&nbsp;&nbsp; {{ $range }}</span>
+                                    </div>
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
 
                 @endif
 
