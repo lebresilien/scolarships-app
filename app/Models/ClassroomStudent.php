@@ -34,4 +34,8 @@ class ClassroomStudent extends Model
     public function courses() {
         return $this->hasMany(Absence::class);
     }
+
+    public function student()  {
+        return $this->belongsTo(Student::class);
+    }
 }

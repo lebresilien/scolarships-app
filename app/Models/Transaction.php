@@ -20,10 +20,8 @@ class Transaction extends Model
         return $this->belongsTo(ClassroomStudent::class, 'classroom_student_id', 'id');
     }
 
-    public function getFullNameAttribute() {
-        return $this->policy;
-        return $student = Student::find($this->policy->student_id);
-        //return $this->policies()->where('academic_id', Academic::whereStatus(true)->first()->id)->first()->student_id;
+    public function getValueAttribute() {
+      return $this->policy;
     }
 
     protected $casts = [

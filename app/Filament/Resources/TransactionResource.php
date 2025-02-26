@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource\RelationManagers;
-use App\Models\Transaction;
+use App\Models\{ ClassroomStudent, Transaction, Student, Academic };
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -23,7 +23,27 @@ class TransactionResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Select::make('classroom_student_id')
+                    ->label('Apprenant')
+                    ->options(function() {
+                        $students = [];
+                        $currentYearPolicies = ClassroomStudent::where('academic_id', Academic::whereStatus(true)->first()->id)->get();
+                        foreach($currentYearPolicies as $policy) {
+                            $students[$policy->id] = Student::find($policy->student_id)->full_name;
+                        }
+                        return $students;
+                    })
+                    ->default('teaching_unit_id')
+                    ->required(),
+                Forms\Components\TextInput::make('name')
+                    ->label('Libellé')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('amount')
+                    ->label('Montant')
+                    ->numeric()
+                    ->required()
+                    ->maxLength(255)
             ]);
     }
 
@@ -31,7 +51,14 @@ class TransactionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('full_name')
+                Tables\Columns\TextColumn::make('value.student.full_name')
+                    ->label('Noms et Prénoms'),
+                Tables\Columns\TextColumn::make('amount')
+                    ->label('Montant')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Libellé')
+                    ->searchable()
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
