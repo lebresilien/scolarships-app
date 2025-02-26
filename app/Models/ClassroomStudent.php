@@ -23,11 +23,6 @@ class ClassroomStudent extends Model
         return $this->hasMany(Transaction::class);
     }
 
-    public function getFullNameAttribute()
-    {
-        return 'namedjdj';
-    }
-
     public function notes() {
         return $this->hasMany(Note::class);
     }

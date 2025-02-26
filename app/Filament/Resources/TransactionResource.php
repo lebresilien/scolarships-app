@@ -31,7 +31,7 @@ class TransactionResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('full_name')
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
