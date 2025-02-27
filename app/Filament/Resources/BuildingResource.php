@@ -38,7 +38,7 @@ class BuildingResource extends Resource
                 Tables\Columns\TextColumn::make('description'),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                //Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

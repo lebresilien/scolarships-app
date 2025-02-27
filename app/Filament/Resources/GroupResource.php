@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\GroupResource\Pages;
 use App\Filament\Resources\GroupResource\RelationManagers;
-use App\Models\Group;
+use App\Models\{ Section, Group };
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -48,7 +48,19 @@ class GroupResource extends Resource
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('section_id')
+                    ->form([
+                        Forms\Components\Select::make('value')
+                            ->label('Section')
+                            ->options(Section::all()->pluck('name', 'id'))
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                fn (Builder $query, $value): Builder => $query->where('section_id', $value)
+                            );
+                })
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

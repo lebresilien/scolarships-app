@@ -139,31 +139,7 @@ class StudentResource extends Resource
                                 $data['value'],
                                 fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('academic_id', $value)),
                             );
-                }),
-                Tables\Filters\Filter::make('state')
-                ->form([
-                    Forms\Components\Toggle::make('state')
-                        ->label('Redoublant')
-                ])
-                ->query(function (Builder $query, array $data): Builder {
-                    return $query
-                        ->when(
-                            $data['state'],
-                            fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('state', $value)),
-                        );
-                }),
-                Tables\Filters\Filter::make('status')
-                    ->form([
-                        Forms\Components\Toggle::make('status')
-                            ->label('Démissionaire')
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['status'],
-                                fn (Builder $query, $value): Builder => $query->whereHas('classrooms', fn (Builder $query): Builder => $query->where('status', $value)),
-                            );
-                    })
+                })                
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
