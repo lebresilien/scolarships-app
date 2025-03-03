@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\{ Sequence, Student, ClassroomStudent, Classroom, Trimester, Note, School };
 use Illuminate\Support\Facades\DB;
 use App\Filament\Traits\ActiveYear;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class PdfController extends Controller
 {
@@ -42,6 +45,21 @@ class PdfController extends Controller
                 $range++;
             }
         }
+
+        $textLines = [
+            'Matricule: ' .$student->matricule,
+            'Noms: ' .Str::ascii($student->lname),
+            'Prenoms: ' .Str::ascii($student->fname),
+            'Date de Naissance: ' .Carbon::parse($student->born_at)->format('d/m/Y'),
+            'Lieu de Naissance: ' .Str::ascii($student->born_place),
+            'Examen: ' .Str::ascii(Sequence::find($seq)->name),
+            'Moyenne: ' .$averageGrades->where('classroom_student_id', $student->policy)->first()->average,
+            'Rang: '.$range
+            // Add more lines as needed
+        ];
+
+        $text = implode(PHP_EOL, $textLines);
+        $qr_code = QrCode::size(60)->generate($text);
      
         return view('pdf.sequence', [
             'record' => $student,
@@ -50,6 +68,7 @@ class PdfController extends Controller
             'statistics' => $averageGrades,
             'range' => $range,
             'school' => School::all()->first(),
+            'qr_code' => $qr_code
         ]);
     }
 
@@ -77,7 +96,22 @@ class PdfController extends Controller
                 $range++;
             }
         }
-       // return $trimester->notes($sequences_id)->get();
+       
+        $textLines = [
+            'Matricule: ' .$student->matricule,
+            'Noms: ' .Str::ascii($student->lname),
+            'Prenoms: ' .Str::ascii($student->fname),
+            'Date de Naissance: ' .Carbon::parse($student->born_at)->format('d/m/Y'),
+            'Lieu de Naissance: ' .Str::ascii($student->born_place),
+            'Examen: ' .Str::ascii($trimester->name),
+            'Moyenne: ' .$averageGrades->where('classroom_student_id', $student->policy)->first()->average,
+            'Rang: ' .$range
+            // Add more lines as needed
+        ];
+
+        $text = implode(PHP_EOL, $textLines);
+        $qr_code = QrCode::size(60)->generate($text);
+
         return view('pdf.trimester', [
             'record' => $student,
             'seq' => $trimester,
@@ -85,7 +119,8 @@ class PdfController extends Controller
             'statistics' => $averageGrades,
             'range' => $range,
             'school' => School::all()->first(),
-            'sequences_id' => $sequences_id
+            'sequences_id' => $sequences_id,
+            'qr_code' => $qr_code
         ]);
     }
 

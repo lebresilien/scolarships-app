@@ -242,6 +242,8 @@
 
                 </div>
 
+                <div>{{ $qr_code }}</div>
+
                 <div>
                     @if ($record->logo)
                         <img src="{{ asset('storage/' . $record->logo) }}" alt="logo" /> 

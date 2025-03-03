@@ -19,9 +19,9 @@ class DatabaseSeeder extends Seeder
             ['remember_token' => 'NDKKDJDJDOD8LD'],
         ))->create(); */
 
-        $classroom = Classroom::find(14);
+        $classroom = Classroom::find(17);
 
-        Student::factory(7)->state(new Sequence(
+        Student::factory(5)->state(new Sequence(
             ['sexe' => 1],
             ['sexe' => 0],
         ))

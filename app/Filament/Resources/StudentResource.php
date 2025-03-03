@@ -62,6 +62,7 @@ class StudentResource extends Resource
                             ->maxLength(255)
                             ->required(),
                         Forms\Components\Select::make('classroom_id')
+                            ->searchable()
                             ->relationship('classrooms', 'name')
                             ->visibleOn('create')
                             ->required(),
@@ -80,7 +81,7 @@ class StudentResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Informations des Parents')
+                Forms\Components\Section::make('Informations des Parents ou Tuteurs')
                     ->schema([
                         Forms\Components\TextInput::make('father_name')
                             ->label('Nom du père ou Tuteur')

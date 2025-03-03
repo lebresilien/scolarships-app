@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\TeachingUnitResource\Pages;
 use App\Filament\Resources\TeachingUnitResource\RelationManagers;
-use App\Models\TeachingUnit;
+use App\Models\{ Group, TeachingUnit };
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -63,7 +63,19 @@ class TeachingUnitResource extends Resource
                 Tables\Columns\TextColumn::make('description')
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('group_id')
+                    ->form([
+                        Forms\Components\Select::make('value')
+                        ->label('Groupe')
+                        ->options(Group::all()->pluck('name', 'id'))
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['value'],
+                                fn (Builder $query, $value): Builder => $query->where('group_id', $value)
+                            );
+                }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

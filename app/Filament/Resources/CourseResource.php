@@ -53,6 +53,7 @@ class CourseResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('classroom_id')
                     ->label('Salle de classe')
+                    ->searchable()
                     ->relationship('classroom', 'name')
                     ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required()
@@ -73,6 +74,7 @@ class CourseResource extends Resource
                     ->required(),
                 Forms\Components\Select::make('teacher_id')
                     ->label('Enseignant')
+                    ->searchable()
                     ->relationship('teacher', 'name')
                     ->hidden(fn (Forms\Get $get) => School::all()->first()->is_primary_school)
                     ->required(),
